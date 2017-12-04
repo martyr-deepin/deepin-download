@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>task_pause_insensitive</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.400000006">
+        <g id="task_pause_insensitive" fill-rule="nonzero" fill="#303030">
+            <g id="Group" transform="translate(9.000000, 7.000000)">
+                <path d="M0,0 L1,0 L1,10 L0,10 L0,0 Z M5,0 L6,0 L6,10 L5,10 L5,0 Z" id="Pause"></path>
+            </g>
+        </g>
+    </g>
+</svg>
