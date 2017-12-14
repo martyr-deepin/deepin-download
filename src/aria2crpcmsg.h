@@ -2,6 +2,7 @@
 #define ARIA2CRPCMSG_H
 
 #include <QMap>
+#include <QNetworkAccessManager>
 
 #include "optionstruct.h"
 
@@ -16,13 +17,14 @@ class GCJsonRPC;
 
 /** ============================================================ */
 
-class Aria2cRPCMsg : QObject
-{
+class Aria2cRPCMsg : QObject{
+
+   Q_OBJECT
 
 private:
 
    GCJsonRPC *gcjsonrpc;
-   MainWindow* mainUI;
+
    QMap<QString,QString> gidList;
 
    /** 发送消息 */
@@ -32,6 +34,7 @@ private:
   QString GetFileName( QString path );
 
   int  Errot_U = 0;
+  MainWindow* mainUI;
 
 public:
 

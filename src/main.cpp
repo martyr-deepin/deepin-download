@@ -28,7 +28,6 @@ DWIDGET_USE_NAMESPACE
 int main(int argc, char *argv[])
 {
 
-
     QString fileURL = "";
 
     /**
@@ -67,6 +66,7 @@ int main(int argc, char *argv[])
     /**
     * 单例测试
     **/
+
     if (!app.setSingleInstance("deepin-download")) {
 
          qDebug() << "there's an deepin-download instance running.";
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
                                  "/com/deepin/Download",
                                  "com.deepin.Download", QDBusConnection::sessionBus());
 
-         /*auto reply = */ iface->call("ShowDownWindow", fileURL );
+         auto reply =  iface->call("ShowDownWindow", fileURL );
          return 0;
     }
 

@@ -14,18 +14,20 @@ class Aria2cRPCMsg;
 #include "aria2crpcmsg.h"
 
 
-class GCJsonRPC : public QObject
-{
+class GCJsonRPC : public QObject{
+
+    Q_OBJECT
 
 private:
 
     Aria2cRPCMsg* aria2c_rpc_msg = NULL;
     QString actionResult = "http://localhost:6800/jsonrpc";
+    QNetworkAccessManager* manager = Q_NULLPTR;
 
 public:
 
-    GCJsonRPC();
-    GCJsonRPC( QString actionResult , Aria2cRPCMsg* aria2c_rpc_msg );
+    GCJsonRPC();    
+    GCJsonRPC( QString actionResult , Aria2cRPCMsg* aria2c_rpc_msg  );
 
     void SendMessage(  QString jsonrpc ,QString id ,QString method );
     void SendMessage(  QString jsonrpc ,QString id ,QString method, QJsonArray params );

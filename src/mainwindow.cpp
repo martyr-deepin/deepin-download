@@ -27,6 +27,9 @@
 #include <QCoreApplication>
 #include <QProcess>
 #include <QClipboard>
+#include <QThread>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 #include "sqlitefunt.h"
 #include "interfaceadaptor.h"
@@ -35,7 +38,25 @@
 #include "dthememanager.h"
 #include "utils.h"
 
+#define  SLEEPSS          2000
+
 MainWindow::MainWindow(DMainWindow *parent) :DMainWindow( parent){
+
+    initMainWindow();
+}
+
+//removeDownloadResult //purgeDownloadResult
+MainWindow::~MainWindow(){
+
+    qDebug() << "~MainWindow()";
+
+    delete this->downDB;
+    delete this->aria2c;
+    delete this->newDownDlg;
+
+}
+
+void MainWindow::initMainWindow(){
 
     /**
      *  初始化 aria2c 接口
@@ -56,7 +77,6 @@ MainWindow::MainWindow(DMainWindow *parent) :DMainWindow( parent){
     board = QApplication::clipboard();
 
     DThemeManager::instance()->setTheme("light");
-
     installEventFilter(this);
 
     layoutWidget = new QWidget();
@@ -65,12 +85,11 @@ MainWindow::MainWindow(DMainWindow *parent) :DMainWindow( parent){
 
     slidebar = new SlideBar();
 
-
     centerWidget = new QWidget;  //中部容器（ 表格 ）
     LoadTableView( centerWidget );  //中部主体表格
 
-    layout->addWidget(slidebar);        
-    layout->addWidget(centerWidget, 1);
+    layout->addWidget(slidebar);
+    layout->addWidget(centerWidget );
 
     this->setCentralWidget(layoutWidget);
 
@@ -91,29 +110,30 @@ MainWindow::MainWindow(DMainWindow *parent) :DMainWindow( parent){
     aboutDlg  = new AboutDlg;
 
     /** 浮窗 */
+    /***
     mwm  = new MWM( this );
     mwm->ShowMWM();
-
+    ***/
 
     /** 启用文件拖入支持 */
     this->setAcceptDrops( true );
 
-    /** 初始化计时器 **/
+    /**
+     * 初始化计时器
+     */
     m_Active = new QTimer( this );
     m_Stop   = new QTimer( this );
     m_Wait   = new QTimer( this );
     m_All    = new QTimer( this );
 
-    m_Active->setInterval( 1000);
-    m_Stop->setInterval( 1000);
-    m_Wait->setInterval( 1000);
-
-    m_All->setInterval( 2000);
+    m_Active->setInterval( SLEEPSS );
+    m_Stop->setInterval( SLEEPSS );
+    m_Wait->setInterval( SLEEPSS );
+    m_All->setInterval( SLEEPSS );
 
     connect( m_Active, SIGNAL(timeout()), this, SLOT( GetActiveList()) );
     connect( m_Stop, SIGNAL(timeout()), this, SLOT( GetStopList()) );
     connect( m_Wait, SIGNAL(timeout()), this, SLOT( GetWaitList()) );
-
     connect( m_All, SIGNAL(timeout()), this, SLOT( UpdateDownStatus()) );
 
     /**
@@ -128,7 +148,10 @@ MainWindow::MainWindow(DMainWindow *parent) :DMainWindow( parent){
     /**
      * 开启 状态刷新
      */
-    m_All->start();
+    //m_All->start();
+
+
+    setupMenu();
 
     /**
      * 主窗口界面相关
@@ -137,39 +160,46 @@ MainWindow::MainWindow(DMainWindow *parent) :DMainWindow( parent){
     setWindowIcon( QIcon(":Resources/images/logo@2x.png")  );
 
 
+
+
     /**
      * dbus 监听，接收二次发起程序时传递的下载文件名URL
      */
     new InterfaceAdaptor( this );
 
+    /**
+     *  */
+    //wThread = new GCThread( this );
+
+
 
 }
 
-MainWindow::~MainWindow(){
+void MainWindow::setupMenu()
+{
+    DTitlebar *titlebar = this->titlebar();
 
-    qDebug() << "~MainWindow()";
+    if ( titlebar ) {
 
-    delete this->downDB;
-    delete this->aria2c;
-    delete this->newDownDlg;
+        //titlebar->setWindowFlags(titlebar->windowFlags() & ~Qt::WindowMaximizeButtonHint);
+        titlebar->setMenu( new QMenu( titlebar ) );
+        titlebar->setSeparatorVisible(true);
+/**
+        QMenu *NM1 = titlebar->menu()->addMenu( "测试" );
+        NM1->addAction( "子项1");
+        NM1->addAction( "子项2");
+        NM1->addAction( "子项3");
+**/
+        QAction *helpItem = titlebar->menu()->addAction("帮助");
+        helpItem->setData( "help" );
+        //titlebar->menu()->addAction("关于");
+        //titlebar->menu()->addAction("退出");
 
+
+    }
 }
-/*
-void MainWindow::keyPressEvent(QKeyEvent *){
 
-}
-*/
-/*
-void MainWindow::resizeEvent(QResizeEvent* event){
 
-    qDebug()<< event->size();
-
-    //int mainWinWidth = event->size().width() - slidebar->width();
-
-    //downListView->SetTableWidth(  mainWinWidth );
-
-}
-*/
 
 void MainWindow::CloseAllWindow(){
 
@@ -178,8 +208,7 @@ void MainWindow::CloseAllWindow(){
     newDownDlg->close();
     aboutDlg->close();
     configDlg->close();
-    mwm->close();
-
+    //mwm->close();
 }
 
 
@@ -232,12 +261,11 @@ void MainWindow::SelToolItem( int btn ){
         default:
             break;
     }
-
-
 }
 
 void MainWindow::SelSlideItem( int row ){
 
+    //wThread->setFunction( 0 );
     this->downListView->ClearAllItem();
 
     if ( m_Active->isActive() )
@@ -249,8 +277,8 @@ void MainWindow::SelSlideItem( int row ){
     if ( m_Wait->isActive() )
         m_Wait->stop();
 
-    //if ( m_All->isActive() )
-    //    m_All->stop();
+    if ( m_All->isActive() )
+        m_All->stop();
 
     qDebug()<< "slideBar.currentRowChanged: " << row;
 
@@ -261,19 +289,23 @@ void MainWindow::SelSlideItem( int row ){
     case 1:   //下载中
 
         m_Active->start();
+        //wThread->setFunction( 1 );
         break;
     case 2:   //队列中
 
         m_Wait->start();
+        //wThread->setFunction( 3 );
         break;
     case 3:   //已完成
 
         m_Stop->start();
+        //wThread->setFunction( 2 );
         break;
 
     case 4:   // 历史记录
-
+        //wThread->setFunction( 0 );
         GetDDList();
+
         break;
 
     default:  //全部任务
@@ -281,7 +313,7 @@ void MainWindow::SelSlideItem( int row ){
         break;
     }
 
-
+    //wThread->start();
 }
 
 
@@ -367,11 +399,11 @@ void MainWindow::LoadTrayIcon(){
            break;
 
        case 5:
-           mwm->HideMWM();    //隐藏悬浮窗
+           //mwm->HideMWM();    //隐藏悬浮窗
            break;
 
        case 6:
-           mwm->ShowMWM();    //显示悬浮窗
+           //mwm->ShowMWM();    //显示悬浮窗
            break;
 
        default:
@@ -447,6 +479,10 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
 
              case 8: //删除下载记录
                 DeleteDownFileDB();
+                break;
+
+             case 9: //缓存清理
+                RemoveAria2Cache();
                 break;
 
              default:
@@ -535,6 +571,24 @@ void MainWindow::OpenDownFile(){
     }
 }
 
+void MainWindow::RemoveAria2Cache(){
+
+    aria2c->SendMsgAria2c_purgeDownloadResult();
+    /**
+    const QModelIndexList selected = downListView->selectionModel()->selectedRows();
+    foreach( const QModelIndex & index, selected){
+
+        QString gid = index.sibling( index.row() ,5 ).data().toString();
+
+        if ( gid != ""  ){
+
+            aria2c->SendMsgAria2c_removeDownloadResult( gid );
+            aria2c->SendMsgAria2c_purgeDownloadResult();
+        }
+    }
+    **/
+}
+
 /**
 * 删除历史记录
 */
@@ -552,9 +606,7 @@ void MainWindow::DeleteDownFileDB(){
 
                 ShowMessageTip( filePath + " 文件删除失败" );
             }
-
             downDB->DeleteDTask( gid );
-
         }
     }
 
@@ -830,6 +882,8 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
 **/
 void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
 
+
+    qDebug() << "UpdateGUI_StatusMsg " << "tbList.at(0)";
     /** 记录下此时 listView 中已选择的行 */
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
 
@@ -861,13 +915,6 @@ void MainWindow::UpdateGUI_CommandMsg( QJsonObject nObj ){
   //
 }
 
-void MainWindow::GetWaitList(){
-
-    this->aria2c->SendMsgAria2c_tellWaiting( 0 ,10 );
-
-}
-
-
 /**
 * 从数据库中获取历史记录
 **/
@@ -887,6 +934,12 @@ void MainWindow::GetDDList(){
        x.Progress = "0";
        this->downListView->InsertItem( i,x );
    }
+
+}
+
+void MainWindow::GetWaitList(){
+
+    this->aria2c->SendMsgAria2c_tellWaiting( 0 ,10 );
 
 }
 
@@ -920,12 +973,14 @@ void MainWindow::ShowWindow(){
 
 void MainWindow::UpdateMWM( QString text ){
 
-   mwm->UpdateMWM( text );
+   /** 更新悬浮窗　*/
+   //mwm->UpdateMWM( text );
 }
 
 void MainWindow::ShowMessageTip( QString text ){
 
-   systemTrayIcon->m_tooltip->ShowMessage( text  );
+   /**  右下角气泡消息窗口　暂弃用 */
+   // systemTrayIcon->m_tooltip->ShowMessage( text  );
 }
 
 void MainWindow::OPenDownUrlDlg( QString DownFileUrl ){
@@ -997,6 +1052,19 @@ int MainWindow::GetSlideSelRow(){
     return this->SlideSelItem;
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+
+void MainWindow::resizeEvent(QResizeEvent* event){
+
+    qDebug() <<"MMM "<<event->size();
+    qDebug() <<"centerWidget " << centerWidget->size();
+    qDebug() <<"downListView " << downListView->size();
+
+    int ww = downListView->size().width();
+    downListView->SetTableWidth( ww );
+
+    qDebug() <<"downListView " << downListView->size();
+}
 
 /**
 *

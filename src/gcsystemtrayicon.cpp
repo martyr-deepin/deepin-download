@@ -2,9 +2,13 @@
 
 GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
 
-    m_tooltip =  new GCToolTips;
 
+    /** 气泡窗　暂弃用
+    m_tooltip =  new GCToolTips;
     m_tooltip->ShowMessage( "测试启动" );
+    **/
+
+
 
     //托盘菜单
     m_menu = new QMenu;

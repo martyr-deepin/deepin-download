@@ -17,7 +17,7 @@ Aria2cRPCMsg::Aria2cRPCMsg( QString actionResult , MainWindow* mainUI )
 {
 
     this->mainUI = mainUI;
-    gcjsonrpc = new GCJsonRPC( actionResult , this );
+    gcjsonrpc = new GCJsonRPC( actionResult , this  );
 }
 
 /**
@@ -54,7 +54,6 @@ void Aria2cRPCMsg::SendRPC2Aria2c( QString dz ,QJsonArray params,QString id )
 
     gcjsonrpc->SendMessage( "2.0", id , dz , params );
 }
-
 
 /**
 *  任务处理
@@ -2189,34 +2188,34 @@ void Aria2cRPCMsg::Aria2cRMsg_tellMessage( QJsonObject nObj ){
              QJsonObject result = resultList.at(i).toObject();
 
              TBItem tbitem;
-/*
-             //qDebug() << result.value( "bitfield" ).toString();
-             //qDebug() <<  "completedLength"<< result.value( "completedLength" ).toString();
-             //qDebug() <<  "connections"<< result.value( "connections" ).toString();
-             //qDebug() <<  "dir"<< result.value( "dir" ).toString();
-             //qDebug() <<  "downloadSpeed"<< result.value( "downloadSpeed" ).toString();
-*/
+/**
+             qDebug() << result.value( "bitfield" ).toString();
+             qDebug() <<  "completedLength"<< result.value( "completedLength" ).toString();
+             qDebug() <<  "connections"<< result.value( "connections" ).toString();
+             qDebug() <<  "dir"<< result.value( "dir" ).toString();
+             qDebug() <<  "downloadSpeed"<< result.value( "downloadSpeed" ).toString();
+**/
              QJsonArray  files = result.value("files").toArray();
 
              for(int j = 0; j < files.size(); j++) {
 
                  QJsonObject file = files.at(j).toObject();
-/*
-                 //qDebug() << "completedLength" << file.value( "completedLength" ).toString();
-                 //qDebug() << "index" <<  file.value( "index" ).toString();
-                 //qDebug() << "length" <<  file.value( "length" ).toString();
-                 //qDebug() << "path" <<  file.value( "path" ).toString();
-                 //qDebug() << "selected" <<  file.value( "selected" ).toString();
-*/
+/**
+                 qDebug() << "completedLength" << file.value( "completedLength" ).toString();
+                 qDebug() << "index" <<  file.value( "index" ).toString();
+                 qDebug() << "length" <<  file.value( "length" ).toString();
+                 qDebug() << "path" <<  file.value( "path" ).toString();
+                 qDebug() << "selected" <<  file.value( "selected" ).toString();
+**/
                  tbitem.savepath = file.value( "path" ).toString();
 
                  QJsonArray  uris = file.value("uris").toArray();
                  for(int k = 0; k < uris.size(); k++ ) {
                      QJsonObject uri = uris.at(k).toObject();
-
-                     //qDebug() <<  "status" << uri.value( "status" ).toString();
-                     //qDebug() <<  "uri" << uri.value( "uri" ).toString();
-
+/**
+                     qDebug() <<  "status" << uri.value( "status" ).toString();
+                     qDebug() <<  "uri" << uri.value( "uri" ).toString();
+**/
                      tbitem.uri = uri.value( "uri" ).toString();
                  }
 
@@ -2225,15 +2224,15 @@ void Aria2cRPCMsg::Aria2cRMsg_tellMessage( QJsonObject nObj ){
                      tbitem.uri = tbitem.savepath;
                  }
              }
-/*
-             //qDebug() << "gid"<<  result.value( "gid" ).toString();
-             //qDebug() << "numPieces"<<  result.value( "numPieces" ).toString();
-             //qDebug() << "pieceLength"<<  result.value( "pieceLength" ).toString();
-             //qDebug() << "status"<<  result.value( "status" ).toString();
-             //qDebug() << "totalLength"<<  result.value( "totalLength" ).toString();
-             //qDebug() << "uploadLength"<<  result.value( "uploadLength" ).toString();
-             //qDebug() << "uploadSpeed"<<  result.value( "uploadSpeed" ).toString();
-*/
+/**
+             qDebug() << "gid"<<  result.value( "gid" ).toString();
+             qDebug() << "numPieces"<<  result.value( "numPieces" ).toString();
+             qDebug() << "pieceLength"<<  result.value( "pieceLength" ).toString();
+             qDebug() << "status"<<  result.value( "status" ).toString();
+             qDebug() << "totalLength"<<  result.value( "totalLength" ).toString();
+             qDebug() << "uploadLength"<<  result.value( "uploadLength" ).toString();
+             qDebug() << "uploadSpeed"<<  result.value( "uploadSpeed" ).toString();
+**/
 
              tbitem.gid = result.value( "gid" ).toString();
 
@@ -2243,10 +2242,10 @@ void Aria2cRPCMsg::Aria2cRMsg_tellMessage( QJsonObject nObj ){
              bool ok;
              long totalLength_long = totalLength.toLong( &ok,10 );
              long completedLength_long = completedLength.toLong( &ok,10 );
-/*
-             //qDebug() << "totalLengthr_long " << totalLength_long;
-             //qDebug() << "completedLength_long " << completedLength_long;
-*/
+/**
+             qDebug() << "totalLengthr_long " << totalLength_long;
+             qDebug() << "completedLength_long " << completedLength_long;
+**/
              int  bitfield = 0;
              if ( completedLength_long >0 ){
 

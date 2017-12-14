@@ -49,12 +49,16 @@ ToolBar::ToolBar(QWidget *parent) : QWidget(parent)
     toolsG->addAction( tBtn7 );
 
     layout->addWidget(icon);
-    layout->addSpacing(90);
+    layout->addSpacing(150);
     layout->addStretch();
 
     layout->addWidget( toolsG, 0, Qt::AlignHCenter);
     //layout->setSpacing( 25 );
     layout->addStretch();
+
+
+    tBtn2->setVisible( false );
+    tBtn3->setVisible( false );
 
     connect( toolsG , &QToolBar::actionTriggered, this, &ToolBar::ToolBtnClick );
 

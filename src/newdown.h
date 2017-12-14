@@ -22,13 +22,11 @@ public:
 private:
 
     MainWindow  *mainUI;
-
-    QTextEdit   *Edit1;
-    //QLabel      *Label1;
+    QTextEdit   *Edit1;    
     QLabel      *msg;
-
-    //QPushButton *button1;
-    //QPushButton *button2;
+    QString     GetThunderUrl(  QString thunder_url );
+    int         dtype = 0;
+    QString     dPath = "";
 
 signals:
 
@@ -36,6 +34,8 @@ private slots:
 
     void Button1Click();
     void Button2Click();
+    void Button3Click();
+    void openFileDlg();
 
 };
 

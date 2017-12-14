@@ -5,6 +5,13 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QCloseEvent>
+
+
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
+
+
 //#include <QAction>
 //#include <QMap>
 
@@ -40,8 +47,8 @@ class MWM;
 class DownListView;
 #include "downlistview.h"
 
-//class GCThread;
-//#include "gcthread.h"
+class GCThread;
+#include "gcthread.h"
 
 
 /** =============================================== */
@@ -65,16 +72,21 @@ public:
     //void resizeEvent(QResizeEvent* event);
 
 public:
-    SQLiteFunt *downDB;
+    SQLiteFunt      *downDB;
+    Aria2cRPCMsg    *aria2c;
+    //QNetworkAccessManager *manager;
+
 
 protected:
 
-    //GCThread   *wThread;
-    //void initMainWindow();
+    //GCThread  *wThread;
+    void initMainWindow();
+    void setupMenu();
     int  initAria2cWork();
     void dragEnterEvent( QDragEnterEvent *e );
     void dropEvent( QDropEvent *e );
     void closeEvent( QCloseEvent *event );
+    void resizeEvent(QResizeEvent* event);
 
     bool closeApp = false;
     QWidget *centerWidget;
@@ -82,22 +94,24 @@ protected:
 private:
 
     QString         actionResult;
+
     QTimer          *m_Active;
     QTimer          *m_Stop;
     QTimer          *m_Down;
     QTimer          *m_Wait;
     QTimer          *m_All;
+
     QClipboard      *board;         //剪贴板
-    Aria2cRPCMsg    *aria2c;
+
     QList<TBItem>   dlist;
 
     /** 控件、窗口、对话框 */
     NewDown          *newDownDlg;
     ConfigDlg        *configDlg;
     AboutDlg         *aboutDlg;
-    MWM              *mwm;
+    //MWM            *mwm;               //悬浮窗　暂弃用
     DownListView     *downListView;
-    GCSystemTrayIcon *systemTrayIcon;
+    GCSystemTrayIcon *systemTrayIcon;   //状态栏（托盘 ）
     GCStatusBar      *statusBar;
 
     void LoadTableView( QWidget *centerWidget );
@@ -134,6 +148,7 @@ private:
     void CopyUrlToBoard();
     void ShowWindow();
     void ShowTrayMenu();
+    void RemoveAria2Cache();
 
     //////////////////////////////////////////////////////////////////
 
@@ -168,13 +183,16 @@ public:
     void UpdateGUI_StatusMsg(  QList<TBItem>  tbList );
     void UpdateGUI_CommandMsg( QJsonObject nObj );
 
+signals:
+     void start();
+
 /**  定时轮循 信号触发*/
 private slots:
+
     void GetWaitList();
     void GetDDList();
     void GetStopList();
     void GetActiveList();
-
     void UpdateDownStatus();
 
     void SelSlideItem( int row );

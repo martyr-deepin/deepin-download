@@ -1,5 +1,6 @@
 #include "downlistview.h"
 #include <QHeaderView>
+#include <QScrollBar>
 
 DownListView::DownListView( MainWindow *mainUI, QWidget *parent): QTableView( parent ){
 
@@ -66,6 +67,10 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
 
     //隐藏垂直表头
     this->verticalHeader()->setVisible( false );
+
+
+    //this->horizontalScrollBar()->setEnabled( false );
+    this->horizontalScrollBar()->setVisible( false );
 
     //隐藏行头
     //this->verticalHeader()->hide();
@@ -140,21 +145,32 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
    tableHead->setSortIndicator(0,Qt::AscendingOrder);
    tableHead->setSortIndicatorShown(true);
    connect( tableHead, SIGNAL(sectionClicked(int)), this, SLOT(view_sort(int)));
-
-
-
-
 }
 
 void DownListView::SetTableWidth( int MainWidth ){
 
-    int z0 = MainWidth * 100 / 50;
-    int z1 = MainWidth * 100 / 25;
-    int z3 = MainWidth * 100 / 25;
+/**
+    this->setColumnWidth( 0 ,420 );
+    this->setColumnWidth( 1 ,150 );
+    this->setColumnWidth( 3 ,250 );
+**/
 
-    this->setColumnWidth( 0 ,z0 );
-    this->setColumnWidth( 1 ,z1 );
-    this->setColumnWidth( 3 ,z3 );
+
+
+    int z0 = MainWidth * 0.5;
+    int z1 = MainWidth * 0.25;
+    int z3 = MainWidth * 0.25;
+
+    qDebug() << "new Width " << z0;
+
+    if ( z0 >= 400 && z1 >= 100 && z3 >= 200 ){
+
+        this->setColumnWidth( 0 ,z0 );
+        this->setColumnWidth( 1 ,z1 );
+        this->setColumnWidth( 3 ,z3 );
+
+    }
+
 }
 
 void DownListView::UpdateItem( TBItem tbitem  ){
@@ -325,16 +341,19 @@ void DownListView::ShowContextMenu( const QPoint &point ){
     RMenuItem[7] = new QAction("删除下载记录" ,this);
     RMenuItem[7]->setData( "8");
 
+    RMenuItem[8] = new QAction("清理缓存" ,this);
+    RMenuItem[8]->setData( "9");
+
     bool x = false;
 
-    for( int i = 0 ; i < 8 ; i++){
+    for( int i = 0 ; i < 9 ; i++){
         m_ContextMenu->addAction( RMenuItem[i]  );
     }
 
     if( modelindex.row() < 0){
 
-        x = true;
-        for( int i = 0 ; i < 8 ; i++ ){
+        //x = true;
+        for( int i = 0 ; i < 9 ; i++ ){
             RMenuItem[i]->setDisabled( x );
         }
     }

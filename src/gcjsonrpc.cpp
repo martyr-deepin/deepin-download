@@ -8,10 +8,11 @@ GCJsonRPC::GCJsonRPC()
 
 }
 
-GCJsonRPC::GCJsonRPC(QString actionResult ,Aria2cRPCMsg* aria2c_rpc_msg )
+GCJsonRPC::GCJsonRPC(QString actionResult , Aria2cRPCMsg* aria2c_rpc_msg )
 {
     this->aria2c_rpc_msg = aria2c_rpc_msg;
     this->actionResult = actionResult;
+
 }
 
 void GCJsonRPC::SendMessage( QString jsonrpc ,QString id ,QString method )
@@ -21,12 +22,13 @@ void GCJsonRPC::SendMessage( QString jsonrpc ,QString id ,QString method )
     this->SendMessage( jsonrpc,id,method ,params );
 }
 
+
 void GCJsonRPC::SendMessage( QString jsonrpc ,QString id ,QString method, QJsonArray params )
 {
 
     qDebug() << "======================= SendMessage === "+ method +" =================================== ";
 
-    QNetworkAccessManager* manager  = new QNetworkAccessManager;
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
 
     QJsonObject obj;
 
@@ -39,23 +41,28 @@ void GCJsonRPC::SendMessage( QString jsonrpc ,QString id ,QString method, QJsonA
         obj.insert("params", params );
     }
 
-    QNetworkRequest request;
-    request.setUrl(QUrl( actionResult ) );
+    QNetworkRequest *request = new QNetworkRequest;
+    request->setUrl(QUrl( actionResult ) );
 
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json" );
+    request->setHeader(QNetworkRequest::ContentTypeHeader, "application/json" );
 
-    manager->post( request, QJsonDocument( obj ).toJson() );
+    QNetworkReply  *UU = manager->post( *request, QJsonDocument( obj ).toJson() );
 
-    connect( manager,
+    //qDebug() << "51"<<UU->error()<<actionResult << UU->isRunning();
+
+    QObject::connect( manager,
              &QNetworkAccessManager::finished,
-             this ,
-             [=](QNetworkReply *reply){
+             this,
+             [=](QNetworkReply* reply){
 
                  this->GCNetworkReply(reply, method );
                  manager->deleteLater();
                  manager->destroyed();
              });
+
+    //QThread::sleep( 5 );
 }
+
 
 void GCJsonRPC::GCNetworkReply( QNetworkReply* reply,const QString method ){
 
@@ -69,7 +76,7 @@ void GCJsonRPC::GCNetworkReply( QNetworkReply* reply,const QString method ){
        }else{
 
            QByteArray buf = reply->readAll();
-           qDebug() << "OK:"<< buf;
+           //qDebug() << "OK:"<< buf;
 
            QJsonDocument rmsgobj = QJsonDocument::fromJson( buf );
            QJsonObject rconsole = rmsgobj.object();
