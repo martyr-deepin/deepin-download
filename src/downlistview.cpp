@@ -154,12 +154,9 @@ void DownListView::SetTableWidth( int MainWidth ){
     this->setColumnWidth( 1 ,150 );
     this->setColumnWidth( 3 ,250 );
 **/
-
-
-
     int z0 = MainWidth * 0.5;
     int z1 = MainWidth * 0.25;
-    int z3 = MainWidth * 0.25;
+    int z3 = MainWidth - z0 - z1;
 
     qDebug() << "new Width " << z0;
 

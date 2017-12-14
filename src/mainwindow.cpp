@@ -83,7 +83,7 @@ void MainWindow::initMainWindow(){
     layout = new QHBoxLayout(layoutWidget);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    slidebar = new SlideBar();
+    slidebar = new SlideBar();   //左侧边
 
     centerWidget = new QWidget;  //中部容器（ 表格 ）
     LoadTableView( centerWidget );  //中部主体表格
@@ -143,6 +143,9 @@ void MainWindow::initMainWindow(){
     connect( slidebar, SIGNAL(SelSlideItem( int)), this, SLOT( SelSlideItem( int) ) );
     connect( toolbar, SIGNAL(SelToolItem( int)), this, SLOT( SelToolItem( int) ) );
 
+    connect( toolbar, SIGNAL(SearchChang( QString )), this, SLOT( SearchChang( QString ) ) );
+
+
     //////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -151,6 +154,9 @@ void MainWindow::initMainWindow(){
     //m_All->start();
 
 
+    /**
+     * 系统关于菜单
+     */
     setupMenu();
 
     /**
@@ -159,19 +165,15 @@ void MainWindow::initMainWindow(){
     setWindowTitle("深度下载");
     setWindowIcon( QIcon(":Resources/images/logo@2x.png")  );
 
-
-
-
     /**
      * dbus 监听，接收二次发起程序时传递的下载文件名URL
      */
     new InterfaceAdaptor( this );
 
     /**
-     *  */
+     * 多线程轮循
+     */
     //wThread = new GCThread( this );
-
-
 
 }
 
@@ -190,8 +192,8 @@ void MainWindow::setupMenu()
         NM1->addAction( "子项2");
         NM1->addAction( "子项3");
 **/
-        QAction *helpItem = titlebar->menu()->addAction("帮助");
-        helpItem->setData( "help" );
+        //QAction *helpItem = titlebar->menu()->addAction("帮助");
+        //helpItem->setData( "help" );
         //titlebar->menu()->addAction("关于");
         //titlebar->menu()->addAction("退出");
 
@@ -284,6 +286,8 @@ void MainWindow::SelSlideItem( int row ){
 
     this->SlideSelItem = row;
 
+    toolbar->SetToolButton();
+
     switch ( row ) {
 
     case 1:   //下载中
@@ -304,8 +308,8 @@ void MainWindow::SelSlideItem( int row ){
 
     case 4:   // 历史记录
         //wThread->setFunction( 0 );
+        toolbar->SetToolSearch();
         GetDDList();
-
         break;
 
     default:  //全部任务
@@ -328,6 +332,7 @@ void MainWindow::UpdateDownStatus(){
     /** 获取“未完成下载任务”的状态 */
     QList<DDRecord> t = downDB->ReadDDTask();
     for (  int i = 0; i < t.size() ;i++){
+
         this->aria2c->SendMsgAria2c_tellStatus( t.at(i).gid );
     }
 
@@ -857,9 +862,11 @@ void MainWindow::OpenLinkFile( QString filename ){
  */
 void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
 
+    //qDebug() << "UpdateGUI_StatusMsg " <<tbitem.savepath;
+
     downDB->SetDownSavePath( tbitem.gid ,tbitem.savepath );
     /** 更新进度到浮窗 */
-    UpdateMWM( tbitem.Progress );
+    //UpdateMWM( tbitem.Progress );
 
     /** 在数据库表中记录 已完成的任务 */
     if ( tbitem.State == "complete" ){
@@ -1052,18 +1059,39 @@ int MainWindow::GetSlideSelRow(){
     return this->SlideSelItem;
 }
 
+
+void MainWindow::SearchChang( QString  text ) {
+
+    qDebug() << "MainWindow::SearchChang " << text;
+
+
+    for( int i = 0 ; i < downListView->m_dataModel->rowCount() ; i++  ){
+
+        QStandardItemModel *mdb = downListView->m_dataModel;
+
+        QString filename = mdb->index( i,0 ).data().toString();
+
+        if( filename.indexOf(  text ) >= 0 ){
+
+            downListView->selectRow( i );
+        }
+    }
+
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////
 
 void MainWindow::resizeEvent(QResizeEvent* event){
-
+/**
     qDebug() <<"MMM "<<event->size();
     qDebug() <<"centerWidget " << centerWidget->size();
     qDebug() <<"downListView " << downListView->size();
-
+**/
     int ww = downListView->size().width();
     downListView->SetTableWidth( ww );
 
-    qDebug() <<"downListView " << downListView->size();
+    /** qDebug() <<"downListView " << downListView->size(); */
 }
 
 /**
@@ -1170,7 +1198,7 @@ int MainWindow::initAria2cWork(){
 
         ps->start( command, args );
 
-        qDebug() << "发起进程" <<ps->error() ;
+        qDebug() << "发起进程" << ps->error() ;
 
      }
 

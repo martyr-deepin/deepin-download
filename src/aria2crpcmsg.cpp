@@ -51,6 +51,7 @@ void Aria2cRPCMsg::SendRPC2Aria2c( QString dz , QString id )
 
 void Aria2cRPCMsg::SendRPC2Aria2c( QString dz ,QJsonArray params,QString id )
 {
+    qDebug() << "SendRPC2Aria2c " << params << id;
 
     gcjsonrpc->SendMessage( "2.0", id , dz , params );
 }
@@ -234,6 +235,7 @@ void Aria2cRPCMsg::SendMsgAria2c_changePosition( QString id , int pos ,QString h
 */
 void Aria2cRPCMsg::SendMsgAria2c_tellStatus( QString gid ){
 
+   qDebug() <<"SendMsgAria2c_tellStatus: " << gid;
    SendRPC2Aria2c( "aria2.tellStatus" , gid );
 }
 
@@ -1130,7 +1132,7 @@ void Aria2cRPCMsg::Aria2cRMsg_tellStatus( QJsonObject nObj ){
         TBItem tbitem;
 
         QJsonObject  result = nObj.value("result").toObject();
-/*
+
         //qDebug() << "bitfield" << result.value("bitfield").toString();
         //qDebug() << "completedLength" << result.value("completedLength").toString();
         //qDebug() << "connections" << result.value("connections").toString();
@@ -1139,19 +1141,19 @@ void Aria2cRPCMsg::Aria2cRMsg_tellStatus( QJsonObject nObj ){
         ////qDebug() << "errorCode " << result.value("errorCode").toString();
         ////qDebug() << "errorMessage " << result.value("errorMessage").toString();
 
-*/
+
         QJsonArray files = result.value("files").toArray();
 
         for( int i = 0 ; i < files.size() ; i++ ){
 
             QJsonObject file = files.at(i).toObject();
-/*
+
             //qDebug() <<  "completedLength" << file.value("completedLength").toString();
             //qDebug() <<  "index" << file.value("index").toString();
             //qDebug() <<  "length" << file.value("length").toString();
             //qDebug() <<  "path" << file.value("path").toString();
             //qDebug() <<  "selected" << file.value("selected").toString();
-*/
+
             tbitem.savepath =  file.value("path").toString();
 
 
@@ -1160,10 +1162,10 @@ void Aria2cRPCMsg::Aria2cRMsg_tellStatus( QJsonObject nObj ){
 
                 QJsonObject uri = uris.at(j).toObject();
 
-/*
+
                 //qDebug() <<  "status" << uri.value("status");
                 //qDebug() <<  "uri" << uri.value("uri");
-*/
+
 
                 tbitem.uri = uri.value("uri").toString();
 
@@ -1175,7 +1177,7 @@ void Aria2cRPCMsg::Aria2cRMsg_tellStatus( QJsonObject nObj ){
         }
 
 
-/*
+
         //qDebug() <<"gid"<< result.value("gid").toString();
         //qDebug() <<"numPieces"<< result.value("numPieces").toString();
         //qDebug() <<"pieceLength"<< result.value("pieceLength").toString();
@@ -1183,7 +1185,7 @@ void Aria2cRPCMsg::Aria2cRMsg_tellStatus( QJsonObject nObj ){
         //qDebug() <<"totalLength"<< result.value("totalLength").toString();
         //qDebug() <<"uploadLength"<< result.value("uploadLength").toString();
         //qDebug() <<"uploadSpeed"<< result.value("uploadSpeed").toString();
-*/
+
 
          tbitem.gid = result.value("gid").toString();
 

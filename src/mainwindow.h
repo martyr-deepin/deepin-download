@@ -198,6 +198,8 @@ private slots:
     void SelSlideItem( int row );
     void SelToolItem( int btn );
 
+    void SearchChang( QString  text );
+
 private:
 
 

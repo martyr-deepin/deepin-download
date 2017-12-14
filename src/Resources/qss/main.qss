@@ -27,9 +27,73 @@ QHeaderView::section {
     border-color: rgb(64, 64, 64);
 }
 
-QToolBar{
-    border: 0px;
+
+QToolBar {
+    /*background-color: #222222;*/
+    border: none;
+    padding: 1px;
 }
+
+QToolBar:handle {
+
+    /*background: #222222;*/
+    /*border-left: 1pxdotted yellow*/;
+    /*color: #222222;*/
+
+}
+
+QToolBar::separator {
+
+    /*
+    width: 5px;
+    background-color: #222222;
+    */
+}
+
+
+QToolButton {
+    border: 1px /*solid #222222*/;
+    margin: 1px;
+    width:32px;
+    height:32px;
+}
+
+QToolButton:hover {
+    background-color: #f2f0f5;
+    border: 1px /*solid #222222*/;
+}
+
+QToolButton[popupMode="1"] {
+/*
+    padding-right: 20px;
+*/
+}
+
+QToolButton::menu-button {
+/*
+    border-left: 1px solid #333333;
+    background: transparent;
+    width: 16px;
+*/
+}
+
+QToolButton::menu-button:hover {
+/*
+    border-left: 1px solid #444444;
+    background: transparent;
+    width: 16px;
+*/
+}
+
+QToolButton:checked, QToolButton:pressed {
+/*
+    background-color: #111111;
+    color: yellow;
+*/
+}
+
+
+/*  ////////////////////////////////////////////////////////////////////   */
 
 QProgressBar{
     border:2px solid grey;

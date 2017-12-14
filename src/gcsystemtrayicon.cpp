@@ -48,6 +48,10 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
     m_menu->addAction( m_action1 );
     m_menu->addAction( m_action2 );
 
+    m_action3->setVisible( false );
+    m_action5->setVisible( false );
+    m_action6->setVisible( false );
+
     //connect(m_action1, &QAction::triggered, this, &GCSystemTrayIcon::ShowWindow);
     //connect(m_action2, &QAction::triggered, this, &GCSystemTrayIcon::ShowTrayMessage);
 

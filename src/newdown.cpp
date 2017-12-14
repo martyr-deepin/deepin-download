@@ -116,6 +116,10 @@ void NewDown::Button2Click(){
 
                   url = GetThunderUrl( url );
                   //QMessageBox::information( NULL, "",   url );
+                  if( url == "" ){
+                      this->msg->setText( "下载地址非法..." );
+                      return;
+                  }
               }
 
               if ( url.trimmed() != "" ){
@@ -186,7 +190,16 @@ QString NewDown::GetThunderUrl(  QString thunder_url ){
     //thunder://QUFodHRwOi8vdG9vbC5sdS90ZXN0LnppcFpa
     //QString thunder_url = "thunder://QUFodHRwOi8vdG9vbC5sdS90ZXN0LnppcFpa";
     qDebug() << "thunder_url" << thunder_url;
-    QString _url = Base64::decode( thunder_url.replace( "thunder://" ,"" ) );
+
+    QString _url = "";
+    try{
+
+        _url = Base64::decode( thunder_url.replace( "thunder://" ,"" ) );
+    }catch(...){
+
+        return "";
+    }
+
 
     qDebug() << "thunder_url" << _url   ;
     QString urlStr = "";

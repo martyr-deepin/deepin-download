@@ -13,9 +13,9 @@ SlideBar::SlideBar(QListWidget *parent) : QListWidget(parent)
         D:全部任务
     */
 
-    selectAllItem = new SlideItem("all", "全部任务");
-    selectDownloadingItem = new SlideItem("downloading", "下载中");
-    selectTaskItem = new SlideItem("task_pause", "队列中");
+    selectAllItem = new SlideItem("nav_alltask", "全部任务");
+    selectDownloadingItem = new SlideItem("nav_downloading", "下载中");
+    selectTaskItem = new SlideItem("task_pause", "已暂停");
     selectDoneItem = new SlideItem("nav_done", "已完成");
     selectfileItem = new SlideItem("file", "历史记录");
     //selectDocumentItem = new SlideItem("document", "全部任务");

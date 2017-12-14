@@ -8,11 +8,12 @@
 #include <QToolBar>
 #include "QAction"
 
+
 ToolBar::ToolBar(QWidget *parent) : QWidget(parent)
 {
     this->setFixedHeight(24);
     
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     
     QSvgWidget *icon = new QSvgWidget(QString(":Resources/images/logo_24.svg"));
@@ -46,35 +47,59 @@ ToolBar::ToolBar(QWidget *parent) : QWidget(parent)
     toolsG->addAction( tBtn4 );
     toolsG->addAction( tBtn5 );
     toolsG->addAction( tBtn6 );
-    toolsG->addAction( tBtn7 );
+    //toolsG->addAction( tBtn7 );
 
-    layout->addWidget(icon);
-    layout->addSpacing(150);
+    searchedit = new Dtk::Widget::DSearchEdit;
+
+    layout->addWidget( icon );
+    layout->addSpacing( 150 );
+
+    layout->addStretch();
+    layout->addWidget( toolsG );
+    layout->addWidget( searchedit );
     layout->addStretch();
 
-    layout->addWidget( toolsG, 0, Qt::AlignHCenter);
     //layout->setSpacing( 25 );
-    layout->addStretch();
-
 
     tBtn2->setVisible( false );
     tBtn3->setVisible( false );
 
+    QHBoxLayout *layout2 = new QHBoxLayout(this);
+    setLayout( layout2 );
+
     connect( toolsG , &QToolBar::actionTriggered, this, &ToolBar::ToolBtnClick );
 
+    connect( searchedit , &Dtk::Widget::DSearchEdit::returnPressed, this, &ToolBar::returnPressed );
+}
+
+ToolBar::~ToolBar(){
+    
+}
+
+
+void ToolBar::SetToolSearch(){
+
+    //searchedit->setVisible( false );
+    //toolsG->setVisible( true );
+
+}
+
+void ToolBar::SetToolButton(){
+
+    //searchedit->setVisible( true );
+    //toolsG->setVisible( false );
 }
 
 void ToolBar::ToolBtnClick( QAction *action ){
 
    qDebug() << "ToolBtnClick " << action->data().toString();
-
    emit SelToolItem(  action->data().toInt() );
 }
 
-ToolBar::~ToolBar() 
-{
-    
+void ToolBar::returnPressed(){
+
+    //qDebug() << "searchedit->text: ==> " << searchedit->text() ;
+
+    emit SearchChang( searchedit->text() );
 }
-
-
 
