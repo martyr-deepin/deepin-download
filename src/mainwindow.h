@@ -163,9 +163,11 @@ private:
 
     SlideBar *slidebar;
     ToolBar  *toolbar;
+    QLabel   *bottomlabel;
 
 
 public:
+    void SetBottomStatusText( QString text );
     void ShowMessageTip( QString text );
     void AppendDownBT( QString btfilepath );
     void AppendDownUrl( QString urlStr  );

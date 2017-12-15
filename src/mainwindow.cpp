@@ -76,25 +76,37 @@ void MainWindow::initMainWindow(){
      */
     board = QApplication::clipboard();
 
+    /**
+     * 主界面样式 & 布局
+     */
     DThemeManager::instance()->setTheme("light");
     installEventFilter(this);
 
-    layoutWidget = new QWidget();
-    layout = new QHBoxLayout(layoutWidget);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layoutWidget = new QWidget();    
+    QVBoxLayout *mainlayout = new QVBoxLayout( layoutWidget );
+    mainlayout->setContentsMargins(0, 0, 0, 10);
 
-    slidebar = new SlideBar();   //左侧边
+    layout = new QHBoxLayout();
 
-    centerWidget = new QWidget;  //中部容器（ 表格 ）
-    LoadTableView( centerWidget );  //中部主体表格
+    slidebar = new SlideBar();        //左侧边
+    centerWidget = new QWidget;       //中部容器（ 表格 ）
+    LoadTableView( centerWidget );    //中部主体表格
 
     layout->addWidget(slidebar);
     layout->addWidget(centerWidget );
 
-    this->setCentralWidget(layoutWidget);
-
-    toolbar = new ToolBar();
+    toolbar = new ToolBar();          //工具栏
     this->titlebar()->setCustomWidget(toolbar, Qt::AlignVCenter, false);
+
+    QHBoxLayout *bottomlayout = new QHBoxLayout;  // 底部栏
+    bottomlabel = new QLabel;
+    bottomlayout->addStretch();
+    bottomlayout->addWidget( bottomlabel );
+    bottomlayout->addStretch();
+
+    mainlayout->addLayout(  layout );
+    mainlayout->addLayout( bottomlayout );
+    this->setCentralWidget(  layoutWidget );
 
 
     /** 加载托盘 */
@@ -174,6 +186,9 @@ void MainWindow::initMainWindow(){
      * 多线程轮循
      */
     //wThread = new GCThread( this );
+
+    /** 状态栏文本设置 */
+    SetBottomStatusText("");
 
 }
 
@@ -320,6 +335,13 @@ void MainWindow::SelSlideItem( int row ){
     //wThread->start();
 }
 
+
+
+void MainWindow::SetBottomStatusText( QString text ){
+
+
+    bottomlabel->setText(  text  );
+}
 
 /**
 *  每两秒向 aria2 抓取一次 状态
