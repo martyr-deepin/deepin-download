@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+
+export QT_SELECT=5
+
+%:
+	dh $@
+
+
+# dh_make generated override targets
+# This is example for Cmake (See https://bugs.debian.org/641051 )
+#override_dh_auto_configure:
+#	dh_auto_configure -- #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
+
+
+override_dh_auto_configure:
+	cd src && qmake -makefile -nocache QMAKE_STRIP=: PREFIX=/usr
+
+override_dh_auto_build:
+	cd src && make
+
+override_dh_auto_install:
+	dh_auto_install
+	mkdir -p debian/deepin-download/usr/bin
+	cp src/deepin_download debian/deepin-download/usr/bin/
