@@ -1,9 +1,0 @@
-{
-    "name": "com.ctrip.ops.mysql.callapp",
-    "description": "Chrome call native app and sent message to app.",
-    "path": "/home/gaochong/deepin_work_app/deepin_download/build-deepin_download-unknown-Debug/deepin_download",
-    "type": "stdio",
-    "allowed_origins": [
-        "chrome-extension://gopcfccgjpkkpabnbfflbchgaodjbdik/"
-    ]
-}
