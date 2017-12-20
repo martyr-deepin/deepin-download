@@ -92,7 +92,7 @@
 /* #undef HAVE_CFPREFERENCESCOPYAPPVALUE */
 
 /* define if the compiler supports basic C++11 syntax */
-/* #undef HAVE_CXX11 */
+#define HAVE_CXX11 1
 
 /* Define to 1 if you have the `daemon' function. */
 #define HAVE_DAEMON 1

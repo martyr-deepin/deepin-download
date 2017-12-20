@@ -214,6 +214,7 @@ subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/aria2_arg.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
+	$(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
 	$(top_srcdir)/m4/fallocate.m4 $(top_srcdir)/m4/gettext.m4 \
 	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
@@ -774,16 +775,16 @@ TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp \
 	$(top_srcdir)/test-driver
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/gaochong/deepin-download/src/aria2/missing aclocal-1.15
+ACLOCAL = ${SHELL} /home/zs/master/deepin-download/src/aria2/missing aclocal-1.15
 ALLOCA = 
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 APPLETLS_LDFLAGS = 
 AR = ar
 ARIA2_STATIC = no
-AUTOCONF = ${SHELL} /home/gaochong/deepin-download/src/aria2/missing autoconf
-AUTOHEADER = ${SHELL} /home/gaochong/deepin-download/src/aria2/missing autoheader
-AUTOMAKE = ${SHELL} /home/gaochong/deepin-download/src/aria2/missing automake-1.15
+AUTOCONF = ${SHELL} /home/zs/master/deepin-download/src/aria2/missing autoconf
+AUTOHEADER = ${SHELL} /home/zs/master/deepin-download/src/aria2/missing autoheader
+AUTOMAKE = ${SHELL} /home/zs/master/deepin-download/src/aria2/missing automake-1.15
 AWK = gawk
 CC = gcc
 CCAS = gcc
@@ -794,7 +795,7 @@ CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CPPUNIT_CFLAGS = 
-CPPUNIT_LIBS = -lcppunit
+CPPUNIT_LIBS = 
 CXX = g++
 CXX1XCXXFLAGS = 
 CXXCPP = g++ -E
@@ -809,7 +810,7 @@ DUMPBIN =
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
-EGREP = /usr/bin/grep -E
+EGREP = /bin/grep -E
 EXEEXT = 
 EXPAT_CFLAGS = 
 EXPAT_LIBS = 
@@ -818,12 +819,12 @@ EXTRACPPFLAGS =
 EXTRACXXFLAGS =  -pipe
 EXTRALDFLAGS = 
 EXTRALIBS = 
-FGREP = /usr/bin/grep -F
+FGREP = /bin/grep -F
 GETTEXT_MACRO_VERSION = 0.18
 GMSGFMT = /usr/bin/msgfmt
 GMSGFMT_015 = /usr/bin/msgfmt
-GREP = /usr/bin/grep
-HAVE_CXX11 = 
+GREP = /bin/grep
+HAVE_CXX11 = 1
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -866,9 +867,9 @@ LT_AGE = 0
 LT_CURRENT = 0
 LT_REVISION = 0
 LT_SYS_LIBRARY_PATH = 
-MAKEINFO = ${SHELL} /home/gaochong/deepin-download/src/aria2/missing makeinfo
+MAKEINFO = ${SHELL} /home/zs/master/deepin-download/src/aria2/missing makeinfo
 MANIFEST_TOOL = :
-MKDIR_P = /usr/bin/mkdir -p
+MKDIR_P = /bin/mkdir -p
 MSGFMT = /usr/bin/msgfmt
 MSGFMT_015 = /usr/bin/msgfmt
 MSGMERGE = /usr/bin/msgmerge
@@ -895,7 +896,7 @@ POSUB = po
 POW_LIB = 
 RANLIB = ranlib
 RST2HTML = 
-SED = /usr/bin/sed
+SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/bash
 SPHINXBUILD = 
@@ -917,10 +918,10 @@ YACC = yacc
 YFLAGS = 
 ZLIB_CFLAGS = 
 ZLIB_LIBS = -lz
-abs_builddir = /home/gaochong/deepin-download/src/aria2/test
-abs_srcdir = /home/gaochong/deepin-download/src/aria2/test
-abs_top_builddir = /home/gaochong/deepin-download/src/aria2
-abs_top_srcdir = /home/gaochong/deepin-download/src/aria2
+abs_builddir = /home/zs/master/deepin-download/src/aria2/test
+abs_srcdir = /home/zs/master/deepin-download/src/aria2/test
+abs_top_builddir = /home/zs/master/deepin-download/src/aria2
+abs_top_srcdir = /home/zs/master/deepin-download/src/aria2
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -951,13 +952,13 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/gaochong/deepin-download/src/aria2/install-sh
+install_sh = ${SHELL} /home/zs/master/deepin-download/src/aria2/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
 mandir = ${datarootdir}/man
-mkdir_p = /usr/bin/mkdir -p
+mkdir_p = /bin/mkdir -p
 oldincludedir = /usr/include
 pdfdir = ${docdir}
 prefix = /usr/local
@@ -1037,7 +1038,7 @@ aria2c_LDADD = \
 	 \
 	 \
 	$(top_builddir)/deps/wslay/lib/libwslay.la \
-	-lcppunit \
+	 \
 	 \
 	
 
