@@ -17,6 +17,7 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 	cd src && make
+	cd src/aria2 && ./configure && make
 
 override_dh_auto_install:
 	dh_auto_install
