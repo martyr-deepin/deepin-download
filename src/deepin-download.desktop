@@ -1,0 +1,15 @@
+[Desktop Entry]
+Categories=Application;System;Settings
+Comment=A general Linux download
+Comment[zh_CN]=deepin 下载工具
+Comment[zh_TW]=deepin 下载工具
+Encoding=UTF-8
+Exec=deepin-download
+Icon=deepin-download
+Name=deepin download
+Name[zh_CN]=深度下载
+Name[zh_TW]=深度下载
+StartupNotify=false
+Terminal=false
+Type=Application
+X-MultipleArgs=false

@@ -60,8 +60,11 @@ int main(int argc, char *argv[])
     DApplication app(argc, argv);
     app.loadTranslator();
     app.setOrganizationName("deepin");
-    app.setApplicationName(QObject::tr("deepin-download"));
+    app.setApplicationName("deepin-download");
+    app.setApplicationDisplayName(QObject::tr("deepin-download"));
     app.setApplicationVersion("1.0");
+    app.loadTranslator();
+
 
     /**
     * 单例测试

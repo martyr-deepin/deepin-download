@@ -39,10 +39,7 @@ LIBS += -lX11 -lXext -lXtst
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 ##########################################################################################################
-# 单实例
-#include(qtsingleapplication/qtsingleapplication.pri)
 
-##########################################################################################################
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
@@ -95,3 +92,37 @@ HEADERS += \
     slidebar.h \
     toolbar.h
 
+##########################################################################################################
+
+#多国语言翻译
+
+TRANSLATIONS += translations/deepin-download.ts
+
+##########################################################################################################
+
+#安装桌面快捷方式 、图标
+
+isEmpty(PREFIX){
+    PREFIX = /usr
+}
+
+target.path = $${PREFIX}/bin
+
+icon.path = $$PREFIX/share/icons/hicolor/scalable/apps
+
+icon.files = $$PWD/Resources/images/deepin-download.svg
+
+#安装desktop文件
+
+desktop.path = $$PREFIX/share/applications
+
+desktop.files = $$PWD/deepin-download.desktop
+
+translations.path = $${PREFIX}/share/$${TARGET}/translations
+translations.files = $$PWD/translations/*.qm
+
+# Automating generation .qm files from .ts files
+!system(python $$PWD/tool/translate_generation.py $$PWD): error("Failed to generate translation")
+
+
+INSTALLS += target icon desktop translations

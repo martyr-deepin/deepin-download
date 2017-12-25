@@ -174,7 +174,7 @@ void MainWindow::initMainWindow(){
     /**
      * 主窗口界面相关
      */
-    setWindowTitle("深度下载");
+    setWindowTitle(tr("深度下载"));
     setWindowIcon( QIcon(":Resources/images/logo@2x.png")  );
 
     /**
@@ -569,7 +569,7 @@ void MainWindow::CopyUrlToBoard(){
 
             QString URL = downDB->GetDownUrlPath( gid );
             if( URL == "" ){
-              ShowMessageTip( "获取原地址失败，下载记录可能已经被人为删除" );
+              ShowMessageTip( tr("Failed to get the original address, the download record may have been deleted artificially") );
             }else{
               ShowMessageTip( URL );
               board->setText(  URL );
@@ -592,7 +592,7 @@ void MainWindow::OpenDownFile(){
             if( spathInfo.isFile() ){
                 OpenDownFilePath( SavePath );
             }else{
-                ShowMessageTip( "文件 "+ SavePath + " 不存在，可能已被人为删除。" );
+                ShowMessageTip( tr("File ") + SavePath + tr(" No, it may have been deleted.") );
             }
         }
     }
@@ -631,7 +631,7 @@ void MainWindow::DeleteDownFileDB(){
 
             if ( ! QFile::remove( filePath ) ){
 
-                ShowMessageTip( filePath + " 文件删除失败" );
+                ShowMessageTip( filePath + tr(" File deletion failure") );
             }
             downDB->DeleteDTask( gid );
         }
@@ -772,7 +772,8 @@ void MainWindow::LoadStatusbar( QWidget *bottomWidget ){
 
 void MainWindow::AddBtFile(){
 
-    QString path = QFileDialog::getOpenFileName(this, "打开 BitTorrent 文件", ".", "BTorrent Files(*.torrent)" );
+    QString path = QFileDialog::getOpenFileName(this,
+                                                tr("Open BitTorrent File"), ".", "BTorrent Files(*.torrent)" );
 
     if( path.length() != 0 ) {
 
@@ -783,7 +784,8 @@ void MainWindow::AddBtFile(){
 
 void MainWindow::AddMetalinkFile(){
 
-    QString path = QFileDialog::getOpenFileName(this, "打开 Metalink 文件", ".", "Metalink File(*.metalink)");
+    QString path = QFileDialog::getOpenFileName(this,
+                                                tr("Open Metalink File"), ".", "Metalink File(*.metalink)");
 
     if( path.length() != 0 ) {
 
@@ -806,7 +808,7 @@ void MainWindow::AppendDownUrl( QString urlStr  ){
 
    QString ID = downDB->AppendDTask(  urlStr );
    aria2c->SendMsgAria2c_addUri( urlStr ,ID  );
-   ShowMessageTip( "加入新任务：" + urlStr  );
+   ShowMessageTip( tr("Join a new task：") + urlStr  );
    //slideBar->SetSelectRow( 1 );
 }
 
@@ -814,7 +816,7 @@ void MainWindow::AppendDownBT( QString btfilepath   ){
 
     QString ID = downDB->AppendDTask(  btfilepath ,"2" );
     aria2c->SendMsgAria2c_addTorrent( btfilepath ,ID  );
-    ShowMessageTip( "启用：" + btfilepath  );
+    ShowMessageTip( tr("Enable：") + btfilepath  );
     //slideBar->SetSelectRow( 1 );
 }
 
@@ -822,7 +824,7 @@ void MainWindow::AppendDownMetalink( QString Metalinkfilepath   ){
 
     QString ID = downDB->AppendDTask(  Metalinkfilepath ,"3" );
     aria2c->SendMsgAria2c_addMetalink( Metalinkfilepath ,ID );
-    ShowMessageTip( "启用： " + Metalinkfilepath  );
+    ShowMessageTip( tr("Enable： ") + Metalinkfilepath  );
     //slideBar->SetSelectRow( 1 );
 }
 
@@ -900,7 +902,7 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
            t.gid = tbitem.gid;
            t.type = "4" ;   //4 标注已完成
            downDB->SetDTaskStatus( t );
-           ShowMessageTip( "已完成 " + tbitem.uri  );
+           ShowMessageTip( tr("Completed ") + tbitem.uri  );
         }
    }
 
@@ -1125,7 +1127,8 @@ int MainWindow::initAria2cWork(){
     QProcess *ps  = new QProcess;
     QStringList options;
     options << "-c";
-    options << "ps aux | grep deepin_aria2c";
+    //options << "ps aux | grep deepin_aria2c";
+    options << "ps aux | grep aria2c";
 
     ps->start( "/bin/bash", options );
     ps->waitForFinished();
@@ -1141,7 +1144,7 @@ int MainWindow::initAria2cWork(){
        if ( str == ""  ){
            continue;
        }
-       if ( str.indexOf( "grep deepin_aria2c"  ) < 0 ){
+       if ( str.indexOf( "grep aria2c"  ) < 0 ){
            qDebug()<< str;
            Z = str;
            break;
@@ -1198,7 +1201,8 @@ int MainWindow::initAria2cWork(){
         path = dir.currentPath();
         //aria2c --enable-rpc=true -c --disable-ipv6 --check-certificate=false --dir=/home/gaochong/Downloads/ --rpc-save-upload-metadata=true  --input-file=/home/gaochong/aria2c.session --save-session=/home/gaochong/aria2c.session --save-session-interval=60
         QProcess *aria2c = new QProcess;
-        QString command = path + "/deepin_aria2c";
+        //QString command = path + "/deepin_aria2c";
+        QString command = "/usr/bin/aria2c";
 
         QStringList args;
         /** 基本参数　*/

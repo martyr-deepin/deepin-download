@@ -16,7 +16,7 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) : QDialog(parent){
 
     qDebug() << "NewDown::NewDown( MainWindow *mainUI )";
 
-    this->setWindowTitle( "新建下载" );
+    this->setWindowTitle( tr("New download") );
 
     QWidget *form = new QWidget;       
     QVBoxLayout  *vbLayout = new QVBoxLayout;
@@ -27,7 +27,7 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) : QDialog(parent){
     Edit1->setFixedHeight( 240 );
     Edit1->setStyleSheet("QTextEdit{border:1px solid #101000;}");
 
-    QPushButton *openFileDlg = new QPushButton("torrent　|　metalink　下载");
+    QPushButton *openFileDlg = new QPushButton( tr("torrent　|　metalink　Down file"));
 
     vbLayout->addWidget( Edit1 );
     vbLayout->addWidget( openFileDlg );
@@ -35,8 +35,8 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) : QDialog(parent){
 
     QWidget *buttonGroup = new QWidget;
     QHBoxLayout *Blayout = new QHBoxLayout;
-    QPushButton *button1 = new QPushButton("取消");
-    QPushButton *button2 = new QPushButton("开始下载");
+    QPushButton *button1 = new QPushButton( tr("cancel") );
+    QPushButton *button2 = new QPushButton( tr("Start downloading") );
 
     //QPushButton *button3 = new QPushButton("测试");
     Blayout->addWidget( button1 );
@@ -117,7 +117,7 @@ void NewDown::Button2Click(){
                   url = GetThunderUrl( url );
                   //QMessageBox::information( NULL, "",   url );
                   if( url == "" ){
-                      this->msg->setText( "下载地址非法..." );
+                      this->msg->setText( tr("Download the address illegally...") );
                       return;
                   }
               }
@@ -134,7 +134,7 @@ void NewDown::Button2Click(){
 
    }else{
 
-       msg->setText( "下载地址不能为空..." );
+       msg->setText( tr("Download address download address can not be empty...") );
    }
 
 
@@ -159,7 +159,7 @@ void NewDown::Button3Click(){
 void NewDown::openFileDlg(){
 
     dtype = 0;
-    QString path = QFileDialog::getOpenFileName(this, "打开 BitTorrent | Metalink文件", ".", "BTorrent Metalink Files(*.torrent *.metalink)" );
+    QString path = QFileDialog::getOpenFileName(this, tr("Open BitTorrent | Metalink file"), ".", "BTorrent Metalink Files(*.torrent *.metalink)" );
 
     if( path.length() != 0 ) {
 

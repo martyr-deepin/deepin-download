@@ -15,7 +15,8 @@ DownListView::DownListView( MainWindow *mainUI, QWidget *parent): QTableView( pa
     this->mainUI = mainUI;
 
     QStringList tbHeader;
-    tbHeader << "文件名" << "大小和进度" << "速度" << "剩余" << "状态" << "gid";
+    //tbHeader << "文件名" << "大小和进度" << "速度" << "剩余" << "状态" << "gid";
+    tbHeader << tr("File name") << tr("Size and Process") << tr("Speed") << tr("Remaining time") << "status" << "gid";
 
     QList<TBItem> tbList;
 
@@ -312,33 +313,33 @@ void DownListView::ShowContextMenu( const QPoint &point ){
 
     m_ContextMenu->clear();
 
-    RMenuItem[0] =  new QAction( "暂停" ,this);
+    RMenuItem[0] =  new QAction( tr("Paused") ,this);
     RMenuItem[0]->setData( "1");
 
-    RMenuItem[1] = new QAction("继续" ,this);
+    RMenuItem[1] = new QAction( tr("Continue") ,this);
     RMenuItem[1]->setData( "2");
 
-    RMenuItem[2] = new QAction("移除" ,this);
+    RMenuItem[2] = new QAction( tr("Remove") ,this);
     RMenuItem[2]->setData( "3");
 
-    RMenuItem[3] = new QAction("属性" ,this);
+    RMenuItem[3] = new QAction( tr("property") ,this);
     RMenuItem[3]->setData( "4");
 
     m_ContextMenu->addSeparator();
 
-    RMenuItem[4] = new QAction("重新下载" ,this);
+    RMenuItem[4] = new QAction( tr("Redownload") ,this);
     RMenuItem[4]->setData( "5");
 
-    RMenuItem[5] = new QAction("打开所在文件夹" ,this);
+    RMenuItem[5] = new QAction( tr("Open the folder") ,this);
     RMenuItem[5]->setData( "6");
 
-    RMenuItem[6] = new QAction("复制下载链接" ,this);
+    RMenuItem[6] = new QAction( tr("Copy download link") ,this);
     RMenuItem[6]->setData( "7");
 
-    RMenuItem[7] = new QAction("删除下载记录" ,this);
+    RMenuItem[7] = new QAction( tr("Delete download records") ,this);
     RMenuItem[7]->setData( "8");
 
-    RMenuItem[8] = new QAction("清理缓存" ,this);
+    RMenuItem[8] = new QAction( tr("Clean up caching") ,this);
     RMenuItem[8]->setData( "9");
 
     bool x = false;

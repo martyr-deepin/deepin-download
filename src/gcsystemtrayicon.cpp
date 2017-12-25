@@ -21,24 +21,24 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
     QAction *m_action6 = new QAction( m_menu );
 
 
-    m_action1->setText("关于");
+    m_action1->setText( tr("about") );
     m_action1->setData( 1 );
 
-    m_action2->setText("退出");
+    m_action2->setText( tr("Quit") );
     m_action2->setData( 2 );
 
-    m_action3->setText("选项配置");
+    m_action3->setText( tr("Option Configuration") );
     m_action3->setData( 3 );
     m_action3->setVisible( false );
 
 
-    m_action4->setText("主窗口");
+    m_action4->setText( tr("Main Window") );
     m_action4->setData( 4 );
 
-    m_action5->setText("隐藏悬浮窗");
+    m_action5->setText( tr("Hidden suspension window"));
     m_action5->setData( 5 );
 
-    m_action6->setText("显示悬浮窗");
+    m_action6->setText( tr("Show suspension window"));
     m_action6->setData( 6 );
 
     m_menu->addAction( m_action4 );
@@ -59,7 +59,7 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
 
     //新建托盘要显示的icon
     this->setIcon( QIcon(":Resources/images/logo@2x.png") );
-    this->setToolTip("深度下载");
+    this->setToolTip( tr("deepin download") );
     this->show();    
 
     //connect(this, &QSystemTrayIcon::activated, this, &GCSystemTrayIcon::ActiveTray);//点击托盘，执行相应的动作
