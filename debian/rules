@@ -21,4 +21,4 @@ override_dh_auto_build:
 override_dh_auto_install:
 	dh_auto_install
 	mkdir -p debian/deepin-download/usr/bin
-	cp src/deepin_download debian/deepin-download/usr/bin/
+	cp src/deepin-download debian/deepin-download/usr/bin/

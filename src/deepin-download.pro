@@ -17,7 +17,7 @@ QT += sql
 
 #greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = deepin_download
+TARGET = deepin-download
 TEMPLATE = app
 RESOURCES = deepin_download.qrc
 CONFIG += link_pkgconfig
