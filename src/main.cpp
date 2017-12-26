@@ -86,7 +86,8 @@ int main(int argc, char *argv[])
      * 版权信息
      */
     const char *descriptionText = QT_TRANSLATE_NOOP("MainWindow",
-                                                    "Deepin Download is DTK frontend for aria2"
+                                                    "Deepin Downloader is a built-in downloading tool of "
+                                                    "deepin operating system, supporting single and batch download."
                                                     );
 
     const QString acknowledgementLink = "https://www.deepin.org/acknowledgments/deepin-download";

@@ -19,7 +19,7 @@ SlideBar::SlideBar(QListWidget *parent) : QListWidget(parent)
     selectDoneItem = new SlideItem("nav_done", tr("Finished"));
     selectfileItem = new SlideItem("file", tr("History record"));
     //selectDocumentItem = new SlideItem("document", tr("全部任务"));
-    //selectTrashItem = new SlideItem("trash", tr("垃圾箱"));
+    selectTrashItem = new SlideItem("trash", tr("recycle"));
 
     addSlideItem(selectAllItem);
     addSlideItem(selectDownloadingItem);
@@ -27,7 +27,7 @@ SlideBar::SlideBar(QListWidget *parent) : QListWidget(parent)
     addSlideItem(selectDoneItem);
     addSlideItem(selectfileItem);
     //addSlideItem(selectDocumentItem);
-    //addSlideItem(selectTrashItem);
+    addSlideItem(selectTrashItem);
 
     setFixedWidth(200);
 
@@ -53,7 +53,6 @@ void SlideBar::monitorActiveItem(int activeItemRow)
             selectDownloadingItem->inactive();
             break;
         case 2:
-
             selectTaskItem->inactive();
             break;
         case 3:
@@ -62,10 +61,10 @@ void SlideBar::monitorActiveItem(int activeItemRow)
         case 4:
             selectfileItem->inactive();
             break;
-        case 5:
+        /*case 5:
             selectDocumentItem->inactive();
-            break;
-        case 6:
+            break;*/
+        case 5:
             selectTrashItem->inactive();
             break;
         }
@@ -87,10 +86,10 @@ void SlideBar::monitorActiveItem(int activeItemRow)
     case 4:
         selectfileItem->active();
         break;
-    case 5:
+    /*case 5:
         selectDocumentItem->active();
-        break;
-    case 6:
+        break;*/
+    case 5:
         selectTrashItem->active();
         break;
     }
@@ -105,5 +104,11 @@ void SlideBar::addSlideItem( SlideItem *item )
     addItem( item->getItem() );
     item->getItem()->setSizeHint( QSize(-1, 32) );
     setItemWidget(item->getItem(), item);
+}
+
+
+void SlideBar::SetSelectRow( int row )
+{
+    setCurrentRow( row );
 }
 

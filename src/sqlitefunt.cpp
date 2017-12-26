@@ -74,13 +74,24 @@ void SQLiteFunt::SetDTaskGid( DDRecord  t ){
 
     QSqlQuery query( m_dbconn );
 
-    QString sql="update downlist set gid='"+ t.gid +"' where id = " + t.id;
+    QString sql = "update downlist set gid='"+ t.gid +"' where id = " + QString::number( t.id ,10 );
+
+    qDebug() << sql;
 
     if( ! query.exec( sql ) ){
 
        qDebug()<< "Error SQLiteFunt::SetDBRecord "<< sql;
     }
+/*
+    sql = "delete from downlist where id <> " + QString::number( t.id ,10 ) +" and  url = "+ t.url + " and gid <> '"+  t.gid +"'";
 
+    qDebug() << sql;
+
+    if( ! query.exec( sql ) ){
+
+       qDebug()<< "Error SQLiteFunt::SetDBRecord "<< sql;
+    }
+*/
     query.finish();
 
 }
@@ -101,11 +112,11 @@ DDRecord SQLiteFunt::GetDTaskInfo( QString gid ){
 
     if( query.next() ){
 
-       t.id = query.value(0).toString();
+       t.id = query.value(0).toInt();
        t.url  = query.value(1).toString();
        t.gid = query.value(2).toString();
-       t.type = query.value(3).toString();
-       t.classn = query.value(4).toString();
+       t.type = query.value(3).toInt();
+       t.classn = query.value(4).toInt();
        t.savepath = query.value(5).toString();
 
        qDebug()<< "read " << t.id + " "+ t.url << " "+ t.gid+ " "+ t.type + " " + t.classn;
@@ -121,7 +132,8 @@ QList<DDRecord> SQLiteFunt::ReadDDTask( int type ){
 
     QSqlQuery query( m_dbconn );
 
-    QString sql= "select * from downlist where gid <>'0' and type <>4";
+    //QString sql= "select * from downlist where gid <>'0' and type <>4";
+    QString sql= "select * from downlist where gid <>'0'";
 
     query.exec( sql );
 
@@ -131,14 +143,51 @@ QList<DDRecord> SQLiteFunt::ReadDDTask( int type ){
 
        DDRecord  t;
 
-       t.id = query.value(0).toString();
+       t.id = query.value(0).toInt();
        t.url  = query.value(1).toString();
        t.gid = query.value(2).toString();
-       t.type = query.value(3).toString();
-       t.classn = query.value(4).toString();
+       t.type = query.value(3).toInt();
+       t.classn = query.value(4).toInt();
        t.savepath = query.value(5).toString();
 
-       if( t.type != "1"   ){
+       if( t.type != 1  ){
+           t.url  = t.savepath;
+       }
+
+       qDebug()<< "read " << t.gid;
+
+       ddlist.append( t );
+
+    }
+    query.finish();
+    return ddlist;
+}
+
+/**
+* type 标记为 3 被移除了的任务
+*/
+QList<DDRecord> SQLiteFunt::ReadRecycleList(){
+
+    QSqlQuery query( m_dbconn );
+
+    QString sql= "select * from downlist where type = 3 ORDER BY id DESC;";
+
+    query.exec( sql );
+
+    QList<DDRecord> ddlist;
+
+    while( query.next() ){
+
+       DDRecord  t;
+
+       t.id = query.value(0).toInt();
+       t.url  = query.value(1).toString();
+       t.gid = query.value(2).toString();
+       t.type = query.value(3).toInt();
+       t.classn = query.value(4).toInt();
+       t.savepath = query.value(5).toString();
+
+       if( t.type != 1   ){
            t.url  = t.savepath;
        }
 
@@ -152,6 +201,9 @@ QList<DDRecord> SQLiteFunt::ReadDDTask( int type ){
 }
 
 
+/**
+* 所有任务
+*/
 QList<DDRecord> SQLiteFunt::ReadALLTask(){
 
     QSqlQuery query( m_dbconn );
@@ -164,16 +216,23 @@ QList<DDRecord> SQLiteFunt::ReadALLTask(){
 
     while( query.next() ){
 
+       if( query.value(2).toString() == "0" || query.value(5).toString() == "" ){
+
+           qDebug() << "错误记录 " + query.value(0).toInt();
+           continue;
+       }
+
+
        DDRecord  t;
 
-       t.id = query.value(0).toString();
+       t.id = query.value(0).toInt();
        t.url  = query.value(1).toString();
        t.gid = query.value(2).toString();
-       t.type = query.value(3).toString();
-       t.classn = query.value(4).toString();
+       t.type = query.value(3).toInt();
+       t.classn = query.value(4).toInt();
        t.savepath = query.value(5).toString();
 
-       if( t.type != "1"   ){
+       if( t.type != 1   ){
            t.url  = t.savepath;
        }
 
@@ -209,8 +268,9 @@ void SQLiteFunt::SetDTaskStatus( DDRecord d  ){
 
     QSqlQuery query( m_dbconn );
 
-    QString sql ="update downlist set type ="+ d.type +" where gid='" + d.gid +"'";
+    QString sql ="update downlist set type ="+  QString::number( d.type,10 ) +" where gid='" + d.gid +"'";
 
+    qDebug() << sql ;
     if ( ! query.exec( sql ) ){
 
         qDebug() << "Error : " << sql;
@@ -226,6 +286,8 @@ QString SQLiteFunt::AppendDTask( QString url ,QString classn ){
     QSqlQuery query( m_dbconn );
 
     QString sql ="insert into downlist ( url ,gid,type,classn) values( '"+ url +"','0',0,"+ classn +" )";
+
+    qDebug() << sql;
 
     if ( ! query.exec( sql ) ){
 

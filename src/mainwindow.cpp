@@ -69,7 +69,9 @@ void MainWindow::initMainWindow(){
      * 初始化 sqlite 数据库
      */
     qDebug() << "QSqlDatabase::drivers " <<QSqlDatabase::drivers();
-    this->downDB  = new SQLiteFunt( "deepin_download.db" );
+    QString HomeDir = QDir::homePath();
+    QString dbPath = HomeDir + "/deepin_download.db";
+    this->downDB  = new SQLiteFunt( dbPath );
 
     /**
      * 初始化 剪贴板
@@ -154,16 +156,15 @@ void MainWindow::initMainWindow(){
      **/
     connect( slidebar, SIGNAL(SelSlideItem( int)), this, SLOT( SelSlideItem( int) ) );
     connect( toolbar, SIGNAL(SelToolItem( int)), this, SLOT( SelToolItem( int) ) );
-
     connect( toolbar, SIGNAL(SearchChang( QString )), this, SLOT( SearchChang( QString ) ) );
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 开启 状态刷新
+     * 开启 全部任务状态刷新
      */
-    //m_All->start();
+    m_All->start();
 
 
     /**
@@ -294,8 +295,8 @@ void MainWindow::SelSlideItem( int row ){
     if ( m_Wait->isActive() )
         m_Wait->stop();
 
-    if ( m_All->isActive() )
-        m_All->stop();
+    //if ( m_All->isActive() )
+    //    m_All->stop();
 
     qDebug()<< "slideBar.currentRowChanged: " << row;
 
@@ -327,8 +328,13 @@ void MainWindow::SelSlideItem( int row ){
         GetDDList();
         break;
 
+    case 5:   // 回收站
+        qDebug()<< "回收站";
+        RecycleList();
+        break;
+
     default:  //全部任务
-        //m_All->start();
+        m_All->start();
         break;
     }
 
@@ -351,7 +357,7 @@ void MainWindow::UpdateDownStatus(){
 
     qDebug() << "UpdateDownStatus()";
 
-    /** 获取“未完成下载任务”的状态 */
+    /** 获取“所有下载任务”的状态 */
     QList<DDRecord> t = downDB->ReadDDTask();
     for (  int i = 0; i < t.size() ;i++){
 
@@ -433,6 +439,10 @@ void MainWindow::LoadTrayIcon(){
            //mwm->ShowMWM();    //显示悬浮窗
            break;
 
+       case 8:
+           qDebug()<< "Clear aria2c Cache";
+           break;
+
        default:
            break;
        }
@@ -449,6 +459,8 @@ void MainWindow::LoadTrayIcon(){
 void MainWindow::LoadTableView( QWidget *centerWidget ){
 
     downListView =  new DownListView( this,centerWidget );
+
+    //m_ContextMenu = new QMenu;
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget( downListView );
@@ -467,6 +479,11 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
           qDebug() <<"downListView.DoubleClick: " << modelIndex;
     });
 
+    //右键激活菜单
+    connect( downListView,
+             SIGNAL( customContextMenuRequested( QPoint )),
+             this,
+             SLOT( ShowContextMenu( QPoint )) );
 
    /**
     * 右键菜单
@@ -509,7 +526,8 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
                 break;
 
              case 9: //缓存清理
-                RemoveAria2Cache();
+                //DeleteDownFileDB();
+                RemoveAria2Cache();                
                 break;
 
              default:
@@ -538,10 +556,10 @@ void MainWindow::AgainDown(){
 
         if ( gid == ""  ) continue;
 
-        QString classD =  downDB->GetDTaskInfo( gid ).classn;
+        int classI =  downDB->GetDTaskInfo( gid ).classn;
         QString url = downDB->GetDownUrlPath( gid );
-        bool  z;
-        int classI = classD.toInt( &z,10 );
+
+        downDB->DeleteDTask( gid ); //重新下载会创建一条新的记录，先删除原记录；
 
         switch ( classI ) {
         case  1:
@@ -554,6 +572,7 @@ void MainWindow::AgainDown(){
             AppendDownMetalink( url );
             break;
         default:
+            AppendDownUrl( url );
             break;
         }
     }
@@ -637,21 +656,27 @@ void MainWindow::DeleteDownFileDB(){
         }
     }
 
-    GetDDList();
-
+   GetDDList();
 }
 
 void MainWindow::Remove(){
 
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
-    foreach( const QModelIndex & index, selected){
 
+    foreach( const QModelIndex & index, selected){
         QString gid = index.sibling( index.row() ,5 ).data().toString();
         //QString status = index.sibling( index.row() ,4).data().toString();
         if ( gid != ""  ){
             aria2c->SendMsgAria2c_pause( gid );
             aria2c->SendMsgAria2c_remove( gid );
+
+            DDRecord d;
+            d.gid  = gid;
+            d.type =  3;   //3 移除
+            qDebug() << "Remove :" << gid;
+            downDB->SetDTaskStatus( d );
         }
+
     }
 }
 
@@ -806,15 +831,16 @@ void MainWindow::LoadDownList(){
 
 void MainWindow::AppendDownUrl( QString urlStr  ){
 
-   QString ID = downDB->AppendDTask(  urlStr );
+   QString ID = downDB->AppendDTask(  urlStr );  //添加数据库记录
    aria2c->SendMsgAria2c_addUri( urlStr ,ID  );
    ShowMessageTip( tr("Join a new task：") + urlStr  );
-   //slideBar->SetSelectRow( 1 );
+   slidebar->SetSelectRow( 1 );
+
 }
 
 void MainWindow::AppendDownBT( QString btfilepath   ){
 
-    QString ID = downDB->AppendDTask(  btfilepath ,"2" );
+    QString ID = downDB->AppendDTask(  btfilepath ,"2" ); //添加数据库记录
     aria2c->SendMsgAria2c_addTorrent( btfilepath ,ID  );
     ShowMessageTip( tr("Enable：") + btfilepath  );
     //slideBar->SetSelectRow( 1 );
@@ -822,7 +848,7 @@ void MainWindow::AppendDownBT( QString btfilepath   ){
 
 void MainWindow::AppendDownMetalink( QString Metalinkfilepath   ){
 
-    QString ID = downDB->AppendDTask(  Metalinkfilepath ,"3" );
+    QString ID = downDB->AppendDTask(  Metalinkfilepath ,"3" ); //添加数据库记录
     aria2c->SendMsgAria2c_addMetalink( Metalinkfilepath ,ID );
     ShowMessageTip( tr("Enable： ") + Metalinkfilepath  );
     //slideBar->SetSelectRow( 1 );
@@ -886,26 +912,50 @@ void MainWindow::OpenLinkFile( QString filename ){
  */
 void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
 
-    //qDebug() << "UpdateGUI_StatusMsg " <<tbitem.savepath;
+    qDebug() << "*********** UpdateGUI_StatusMsg : " << tbitem.uri << tbitem.Progress << " ********** " ;
 
     downDB->SetDownSavePath( tbitem.gid ,tbitem.savepath );
+
     /** 更新进度到浮窗 */
     //UpdateMWM( tbitem.Progress );
 
+    if( this->GetSlideSelRow() == 0  ){
+
+        bool findN = false;
+        for( int i = 0 ; i < downListView->m_dataModel->rowCount();i++ ){
+
+            //qDebug()<< downListView->m_dataModel->index(i,0).data().toString();
+
+            QString gid =  downListView->m_dataModel->index(i,5).data().toString();
+
+            if ( gid == tbitem.gid  ){
+
+                downListView->SetItemData( i ,tbitem );
+                findN = true;
+                break;
+            }
+
+        }
+
+        if( ! findN ){
+
+            downListView->InsertItem( downListView->m_dataModel->rowCount() ,tbitem );
+        }
+    }
+
     /** 在数据库表中记录 已完成的任务 */
     if ( tbitem.State == "complete" ){
+        int dbt_Type = downDB->GetDTaskInfo( tbitem.gid ).type;
 
-        QString dbt_Type = downDB->GetDTaskInfo( tbitem.gid ).type;
-        if ( dbt_Type != "4" ){
+        if ( dbt_Type != 4 ){
 
            DDRecord t;
            t.gid = tbitem.gid;
-           t.type = "4" ;   //4 标注已完成
+           t.type = 4 ;   //4 标注已完成
            downDB->SetDTaskStatus( t );
            ShowMessageTip( tr("Completed ") + tbitem.uri  );
-        }
-   }
-
+        }        
+    }
 }
 
 /**
@@ -946,6 +996,29 @@ void MainWindow::UpdateGUI_CommandMsg( QJsonObject nObj ){
   //
 }
 
+
+/**
+* 回收站 数据库表中type 被标记为3 的记录
+*/
+void MainWindow::RecycleList(){
+
+    downListView->ClearAllItem();
+
+    QList<DDRecord> t = this->downDB->ReadRecycleList();
+
+    for( int i = 0 ; i < t.size() ; i++ ){
+
+        TBItem x;
+
+        QString filename = t.at(i).url.right( t.at(i).url.length() - t.at(i).url.lastIndexOf ("/") - 1 );
+        x.uri = filename;
+        x.gid  = t.at(i).gid;
+        x.Progress = "0";
+        this->downListView->InsertItem( i,x );
+    }
+
+}
+
 /**
 * 从数据库中获取历史记录
 **/
@@ -958,7 +1031,6 @@ void MainWindow::GetDDList(){
    for( int i = 0 ; i < t.size() ; i++ ){
 
        TBItem x;
-
        QString filename = t.at(i).url.right( t.at(i).url.length() - t.at(i).url.lastIndexOf ("/") - 1 );
        x.uri = filename;
        x.gid  = t.at(i).gid;
@@ -1011,7 +1083,7 @@ void MainWindow::UpdateMWM( QString text ){
 void MainWindow::ShowMessageTip( QString text ){
 
    /**  右下角气泡消息窗口　暂弃用 */
-   // systemTrayIcon->m_tooltip->ShowMessage( text  );
+   systemTrayIcon->m_tooltip->ShowMessage( text  );
 }
 
 void MainWindow::OPenDownUrlDlg( QString DownFileUrl ){
@@ -1102,6 +1174,139 @@ void MainWindow::SearchChang( QString  text ) {
     }
 
 }
+
+
+void MainWindow::ShowContextMenu( const QPoint &point ){
+
+        qDebug() << "ShowContextMenu: " << point <<"MainUI .....";
+
+        QModelIndex  modelindex = this->downListView->indexAt( point );
+        qDebug() << "ROW ======> " << modelindex.row() + 1;
+
+
+        QAction *RMenuItem[8];
+
+        downListView->m_ContextMenu->clear();
+
+        RMenuItem[0] =  new QAction( tr("Paused") ,this);     //暂停
+        RMenuItem[0]->setData( "1");
+
+        RMenuItem[1] = new QAction( tr("Continue") ,this);    //继续
+        RMenuItem[1]->setData( "2");
+
+        RMenuItem[2] = new QAction( tr("Remove") ,this);      //删除
+        RMenuItem[2]->setData( "3");
+
+        RMenuItem[3] = new QAction( tr("property") ,this);    //属性
+        RMenuItem[3]->setData( "4");
+
+        downListView->m_ContextMenu->addSeparator();
+
+        RMenuItem[4] = new QAction( tr("Redownload") ,this);               //重新下载
+        RMenuItem[4]->setData( "5");
+
+        RMenuItem[5] = new QAction( tr("Show in folder") ,this);          //在文件夹中显示
+        RMenuItem[5]->setData( "6");
+
+        RMenuItem[6] = new QAction( tr("Copy download link") ,this);       //复制下载链接
+        RMenuItem[6]->setData( "7");
+
+        RMenuItem[7] = new QAction( tr("Delete download records") ,this);  //删除下载记录
+        RMenuItem[7]->setData( "8");
+
+        RMenuItem[8] = new QAction( tr("Clean up caching") ,this);         //清除Aria2c 缓存记录
+        RMenuItem[8]->setData( "9");
+
+
+        for( int i = 0 ; i < 9 ; i++){
+            downListView->m_ContextMenu->addAction( RMenuItem[i]  );
+        }
+
+        RMenuItem[3]->setVisible( false );
+        RMenuItem[8]->setVisible( false );
+
+        /**
+         *
+         */
+        ////////////////////////////////////////////////////////////////////////////
+
+        const QModelIndexList selected = downListView->selectionModel()->selectedRows();
+        if ( selected.count() == 0 ){
+            qDebug() << "未有选择任何记录";
+
+            /** 所有菜单项置为无效 */
+            for( int i = 0 ; i < 9 ; i++ ){
+                RMenuItem[i]->setDisabled( true );
+            }
+        }
+
+/*
+        bool x = false;
+        if( modelindex.row() < 0){
+
+            //x = true;
+            for( int i = 0 ; i < 9 ; i++ ){
+                RMenuItem[i]->setDisabled( x );
+            }
+        }
+*/
+
+
+        qDebug() << "GetSelectRow: " << this->GetSlideSelRow();
+
+        int SlideSelRow = this->GetSlideSelRow();
+
+            switch ( SlideSelRow ) {
+                case 0:
+                    break;
+                case 1:  // 下载中
+                    RMenuItem[3]->setDisabled(true);
+                    RMenuItem[4]->setDisabled(true);
+                    RMenuItem[5]->setDisabled(true);
+                    RMenuItem[8]->setDisabled(true);
+                    break;
+                case 2:  // 已暂停
+                    RMenuItem[3]->setDisabled(true);
+                    RMenuItem[4]->setDisabled(true);
+                    RMenuItem[5]->setDisabled(true);
+                    RMenuItem[8]->setDisabled(true);
+                    break;
+                case 3:   //已完成
+                    RMenuItem[0]->setDisabled(true);
+                    RMenuItem[1]->setDisabled(true);
+                    RMenuItem[2]->setDisabled(true);
+
+                    break;
+                case 4:   //历史记录
+                    RMenuItem[0]->setDisabled(true);
+                    RMenuItem[1]->setDisabled(true);
+                    RMenuItem[2]->setDisabled(true);
+                    RMenuItem[7]->setDisabled(false);
+                    RMenuItem[8]->setDisabled(false);
+                    break;
+                case 5:  //回收站
+                    RMenuItem[0]->setDisabled(true);
+                    RMenuItem[1]->setDisabled(true);
+                    RMenuItem[2]->setDisabled(true);
+                    RMenuItem[3]->setDisabled(true);
+                    RMenuItem[4]->setDisabled(false);
+                    RMenuItem[5]->setDisabled(false);
+                    RMenuItem[6]->setDisabled(false);
+                    RMenuItem[7]->setDisabled(false);
+                    RMenuItem[8]->setDisabled(false);
+                    break;
+                case 6:
+                    break;
+                default:
+
+                    break;
+
+            }
+
+
+        downListView->m_ContextMenu->exec( QCursor::pos() ); // 当前鼠标位置
+}
+
 
 
 //////////////////////////////////////////////////////////////////////////////////

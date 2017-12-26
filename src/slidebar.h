@@ -11,7 +11,8 @@ class SlideBar : public QListWidget
 public:
     SlideBar(QListWidget *parent=0);
 	~SlideBar(); 
-    
+    void SetSelectRow( int row );
+
 public slots:
     void monitorActiveItem(int activeItemRow);
     

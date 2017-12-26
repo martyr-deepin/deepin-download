@@ -780,7 +780,7 @@ void Aria2cRPCMsg::Aria2cRMsg_addUri( QJsonObject nObj ){
     //qDebug() << result;
 
     DDRecord t;
-    t.id =  nObj.value("id").toString();
+    t.id =  nObj.value("id").toString().toInt( NULL,10 );
     t.gid = nObj.value("result").toString();
 
     this->mainUI->downDB->SetDTaskGid( t );
@@ -809,7 +809,7 @@ void Aria2cRPCMsg::Aria2cRMsg_addTorrent( QJsonObject nObj ){
     //qDebug() << result;
 
     DDRecord t;
-    t.id =  nObj.value("id").toString();
+    t.id =  nObj.value("id").toInt();
     t.gid = nObj.value("result").toString();
 
     this->mainUI->downDB->SetDTaskGid( t );
@@ -838,7 +838,7 @@ void Aria2cRPCMsg::Aria2cRMsg_addMetalink( QJsonObject nObj ){
   ////qDebug() << result;
 
   DDRecord t;
-  t.id =  nObj.value("id").toString();
+  t.id =  nObj.value("id").toInt();
 
   QJsonArray results =  nObj.value("result").toArray();
   for( int i = 0 ; i < results.size(); i++ ){
@@ -862,7 +862,7 @@ void Aria2cRPCMsg::Aria2cRMsg_remove( QJsonObject nObj ){
     //qDebug() << result;
 
     DDRecord t;
-    t.id =  nObj.value("id").toString();
+    t.id =  nObj.value("id").toInt();
     t.gid = nObj.value("result").toString();
 
     this->mainUI->downDB->SetDTaskGid( t );
@@ -879,7 +879,7 @@ void Aria2cRPCMsg::Aria2cRMsg_pause( QJsonObject nObj ){
     //qDebug() << result;
 
     DDRecord t;
-    t.id =  nObj.value("id").toString();
+    t.id =  nObj.value("id").toInt();
     t.gid = nObj.value("result").toString();
 
     this->mainUI->downDB->SetDTaskGid( t );
@@ -895,7 +895,7 @@ void Aria2cRPCMsg::Aria2cRMsg_forcePause( QJsonObject nObj ){
     //qDebug() << result;
 
     DDRecord t;
-    t.id =  nObj.value("id").toString();
+    t.id =  nObj.value("id").toInt();
     t.gid = nObj.value("result").toString();
 
     this->mainUI->downDB->SetDTaskGid( t );
@@ -928,7 +928,7 @@ void Aria2cRPCMsg::Aria2cRMsg_unpause( QJsonObject nObj ){
     //qDebug() << result;
 
     DDRecord t;
-    t.id =  nObj.value("id").toString();
+    t.id =  nObj.value("id").toInt();
     t.gid = nObj.value("result").toString();
 
     this->mainUI->downDB->SetDTaskGid( t );
@@ -954,7 +954,7 @@ void Aria2cRPCMsg::Aria2cRMsg_forceRemove( QJsonObject nObj ){
     //qDebug() << result;
 
     DDRecord t;
-    t.id =  nObj.value("id").toString();
+    t.id =  nObj.value("id").toInt();
     t.gid = nObj.value("result").toString();
 
     this->mainUI->downDB->SetDTaskGid( t );
