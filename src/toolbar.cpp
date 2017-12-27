@@ -40,14 +40,14 @@ ToolBar::ToolBar(QWidget *parent) : QWidget(parent)
     QAction *tBtn7 = new QAction(QIcon(":Resources/images/search_normal.svg"), "", parent );
     tBtn7->setData( "7" );
 
-    QToolBar *toolsG = new QToolBar;
+    toolsG = new QToolBar;
     toolsG->addAction( tBtn1 );
     toolsG->addAction( tBtn2 );
     toolsG->addAction( tBtn3 );
     toolsG->addAction( tBtn4 );
     toolsG->addAction( tBtn5 );
     toolsG->addAction( tBtn6 );
-    //toolsG->addAction( tBtn7 );
+    toolsG->addAction( tBtn7 );
 
     searchedit = new Dtk::Widget::DSearchEdit;
 
@@ -63,13 +63,16 @@ ToolBar::ToolBar(QWidget *parent) : QWidget(parent)
 
     tBtn2->setVisible( false );
     tBtn3->setVisible( false );
+    searchedit->setVisible( false );
 
     QHBoxLayout *layout2 = new QHBoxLayout(this);
     setLayout( layout2 );
 
     connect( toolsG , &QToolBar::actionTriggered, this, &ToolBar::ToolBtnClick );
 
-    connect( searchedit , &Dtk::Widget::DSearchEdit::returnPressed, this, &ToolBar::returnPressed );
+    connect( searchedit , &Dtk::Widget::DSearchEdit::returnPressed, this, &ToolBar::returnPressed );    
+
+    connect( searchedit , &Dtk::Widget::DSearchEdit::focusOut, this, &ToolBar::focusOut );
 }
 
 ToolBar::~ToolBar(){
@@ -93,6 +96,8 @@ void ToolBar::SetToolButton(){
 void ToolBar::ToolBtnClick( QAction *action ){
 
    qDebug() << "ToolBtnClick " << action->data().toString();
+
+
    emit SelToolItem(  action->data().toInt() );
 }
 
@@ -102,4 +107,13 @@ void ToolBar::returnPressed(){
 
     emit SearchChang( searchedit->text() );
 }
+
+
+void ToolBar::focusOut(){
+
+    //qDebug() << "textChanged:: ==> " << searchedit->text() ;
+
+    emit SearchfocusOut();
+}
+
 

@@ -4,6 +4,12 @@
 <context>
     <name>AboutDlg</name>
     <message>
+        <location filename="../aboutdlg.cpp" line="26"/>
+        <location filename="../aboutdlg.cpp" line="49"/>
+        <source>About Deepin Downloade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../aboutdlg.cpp" line="28"/>
         <source>Deepin Downloader is a built-in downloading tool of deepin operating system, supporting single and batch download.</source>
         <translation type="unfinished"></translation>
@@ -18,7 +24,7 @@
     </message>
     <message>
         <location filename="../downlistview.cpp" line="19"/>
-        <source>Size and Process</source>
+        <source>Process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -31,49 +37,12 @@
         <source>Remaining time</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>GCMessageBox</name>
     <message>
-        <location filename="../downlistview.cpp" line="328"/>
-        <source>Paused</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../downlistview.cpp" line="331"/>
-        <source>Continue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../downlistview.cpp" line="334"/>
-        <source>Remove</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../downlistview.cpp" line="337"/>
-        <source>property</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../downlistview.cpp" line="342"/>
-        <source>Redownload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../downlistview.cpp" line="345"/>
-        <source>Open the folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../downlistview.cpp" line="348"/>
-        <source>Copy download link</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../downlistview.cpp" line="351"/>
-        <source>Delete download records</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../downlistview.cpp" line="354"/>
-        <source>Clean up caching</source>
+        <location filename="../gcmessagebox.cpp" line="33"/>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -81,7 +50,7 @@
     <name>GCSystemTrayIcon</name>
     <message>
         <location filename="../gcsystemtrayicon.cpp" line="26"/>
-        <source>about</source>
+        <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -133,141 +102,76 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="178"/>
+        <location filename="../mainwindow.cpp" line="184"/>
         <source>深度下载</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="591"/>
-        <source>Failed to get the original address, the download record may have been deleted artificially</source>
+        <location filename="../mainwindow.cpp" line="642"/>
+        <source>Target file removed or location changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="614"/>
-        <source>File </source>
+        <location filename="../mainwindow.cpp" line="690"/>
+        <source>File deletion failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="614"/>
-        <source> No, it may have been deleted.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="653"/>
-        <source> File deletion failure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="801"/>
+        <location filename="../mainwindow.cpp" line="849"/>
         <source>Open BitTorrent File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="813"/>
-        <source>Open Metalink File</source>
+        <location filename="../mainwindow.cpp" line="1063"/>
+        <source>%1 tasks are processing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="836"/>
-        <source>Join a new task：</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="845"/>
-        <source>Enable：</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="853"/>
-        <source>Enable： </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="956"/>
-        <source>Completed </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="1191"/>
+        <location filename="../mainwindow.cpp" line="1288"/>
         <source>Paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1194"/>
+        <location filename="../mainwindow.cpp" line="1291"/>
         <source>Continue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1197"/>
-        <source>Remove</source>
+        <location filename="../mainwindow.cpp" line="1294"/>
+        <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1200"/>
-        <source>property</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="1205"/>
+        <location filename="../mainwindow.cpp" line="1302"/>
         <source>Redownload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1208"/>
+        <location filename="../mainwindow.cpp" line="1305"/>
         <source>Show in folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1211"/>
+        <location filename="../mainwindow.cpp" line="1308"/>
         <source>Copy download link</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="1214"/>
-        <source>Delete download records</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="1217"/>
-        <source>Clean up caching</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>NewDown</name>
     <message>
-        <location filename="../newdown.cpp" line="19"/>
-        <source>New download</source>
+        <location filename="../newdown.cpp" line="21"/>
+        <source>New task</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../newdown.cpp" line="30"/>
-        <source>torrent　|　metalink　Down file</source>
+        <location filename="../newdown.cpp" line="68"/>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../newdown.cpp" line="38"/>
-        <source>cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../newdown.cpp" line="39"/>
-        <source>Start downloading</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../newdown.cpp" line="120"/>
-        <source>Download the address illegally...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../newdown.cpp" line="137"/>
-        <source>Download address download address can not be empty...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../newdown.cpp" line="162"/>
-        <source>Open BitTorrent | Metalink file</source>
+        <location filename="../newdown.cpp" line="69"/>
+        <source>Download</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -12,59 +12,95 @@
 
 #include "base64.h"
 
-NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) : QDialog(parent){
+NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) :Dtk::Widget::DDialog(parent){
 
-    qDebug() << "NewDown::NewDown( MainWindow *mainUI )";
+    /*QDialog(parent)*/
 
-    this->setWindowTitle( tr("New download") );
+    this->mainUI = mainUI;
 
-    QWidget *form = new QWidget;       
+    setTitle( tr("New task") );
+
+
+
+    QWidget *form = new QWidget;
     QVBoxLayout  *vbLayout = new QVBoxLayout;
 
     form->setLayout( vbLayout );
 
     Edit1 = new QTextEdit;
     Edit1->setFixedHeight( 240 );
-    Edit1->setStyleSheet("QTextEdit{border:1px solid #101000;}");
+    Edit1->setStyleSheet("QTextEdit{border:1px solid #f3f3f3;}");
 
-    QPushButton *openFileDlg = new QPushButton( tr("torrent　|　metalink　Down file"));
+    QPushButton *openFileDlg = new QPushButton( "torrent　|　metalink　Down file" );
 
     vbLayout->addWidget( Edit1 );
     vbLayout->addWidget( openFileDlg );
 
-
+    /**
+     * @brief buttonGroup
+     * 文案：
+【新建任务】【New task】
+【您输入的地址不能被正确解析，请重试！】【The address cannot be analyzed, please retry!】
+【保存位置】【Save to】
+【取消】【Cancel】
+【开始下载】【Download】
+     */
+    /**
     QWidget *buttonGroup = new QWidget;
     QHBoxLayout *Blayout = new QHBoxLayout;
-    QPushButton *button1 = new QPushButton( tr("cancel") );
-    QPushButton *button2 = new QPushButton( tr("Start downloading") );
+    QPushButton *button1 = new QPushButton( tr("Cancel") );
+    QPushButton *button2 = new QPushButton( tr("Download") );
+
 
     //QPushButton *button3 = new QPushButton("测试");
+
     Blayout->addWidget( button1 );
     Blayout->addWidget( button2 );
+    **/
 
-    buttonGroup->setLayout( Blayout );
+    //buttonGroup->setLayout( Blayout );
 
     msg = new QLabel;
     msg->setText("");
 
-    QVBoxLayout *x = new QVBoxLayout;
-    x->addWidget( form );
-    x->addWidget( msg );
-    x->addWidget( buttonGroup );
+    addContent( form );
+    addContent( msg );
+    int btn1 = addButton( tr("Cancel"), false);
+    int btn2 = addButton( tr("Download"), true, DDialog::ButtonWarning);
 
-    this->setLayout( x );
-
-    this->mainUI = mainUI;
+    setOnButtonClickedClose( false );
 
     this->setFixedSize( 540,400 );
-    setWindowFlags( /**Qt::FramelessWindowHint  | */ Qt::WindowStaysOnTopHint );
+    //setWindowFlags( /**Qt::FramelessWindowHint  | */ Qt::WindowStaysOnTopHint );
 
-
-    connect( button1, &QPushButton::clicked,this,&NewDown::Button1Click );
-    connect( button2, &QPushButton::clicked,this,&NewDown::Button2Click );
+    connect( this, &Dtk::Widget::DDialog::buttonClicked,this,&NewDown::buttonClicked );
+    //connect( button1, &QPushButton::clicked,this,&NewDown::Button1Click );
+    //connect( button2, &QPushButton::clicked,this,&NewDown::Button2Click );
     connect( openFileDlg, &QPushButton::clicked,this,&NewDown::openFileDlg );
 
 }
+
+
+void NewDown::buttonClicked(int index, const QString &text){
+
+    qDebug() << index;
+
+    if( index == 1 ){
+
+        if (  Button2Click() != 0  ){
+
+            return;
+        }
+
+        close();
+    }else{
+
+       Button1Click();
+       close();
+    }
+
+}
+
 
 void NewDown::Button1Click(){
 
@@ -77,7 +113,7 @@ void NewDown::Button1Click(){
 
 }
 
-void NewDown::Button2Click(){
+int NewDown::Button2Click(){
 
    QString urlStrs =  Edit1->toPlainText();
 
@@ -117,8 +153,9 @@ void NewDown::Button2Click(){
                   url = GetThunderUrl( url );
                   //QMessageBox::information( NULL, "",   url );
                   if( url == "" ){
-                      this->msg->setText( tr("Download the address illegally...") );
-                      return;
+                      //【您输入的地址不能被正确解析，请重试！】【The address cannot be analyzed, please retry!】
+                      this->msg->setText( "The address cannot be analyzed, please retry!..." );
+                      return -1;
                   }
               }
 
@@ -132,9 +169,13 @@ void NewDown::Button2Click(){
        this->msg->setText( "" );
        this->close();
 
+       return 0;
+
    }else{
 
-       msg->setText( tr("Download address download address can not be empty...") );
+       msg->setText( "Download address download address can not be empty..." );
+
+       return -2;
    }
 
 
@@ -159,7 +200,7 @@ void NewDown::Button3Click(){
 void NewDown::openFileDlg(){
 
     dtype = 0;
-    QString path = QFileDialog::getOpenFileName(this, tr("Open BitTorrent | Metalink file"), ".", "BTorrent Metalink Files(*.torrent *.metalink)" );
+    QString path = QFileDialog::getOpenFileName(this, "Open BitTorrent | Metalink file", ".", "BTorrent Metalink Files(*.torrent *.metalink)" );
 
     if( path.length() != 0 ) {
 

@@ -88,6 +88,9 @@ protected:
     void closeEvent( QCloseEvent *event );
     void resizeEvent(QResizeEvent* event);
 
+    void slotActionInvoked(uint id, QString action );
+    void notifyActivator( QString title ,QString text  );
+
     bool closeApp = false;
     QWidget *centerWidget;
 
@@ -109,7 +112,7 @@ private:
     NewDown          *newDownDlg;
     ConfigDlg        *configDlg;
     AboutDlg         *aboutDlg;
-    //MWM            *mwm;               //悬浮窗　暂弃用
+    MWM              *mwm;               //悬浮窗　暂弃用
     DownListView     *downListView;
     GCSystemTrayIcon *systemTrayIcon;   //状态栏（托盘 ）
     GCStatusBar      *statusBar;
@@ -201,8 +204,8 @@ private slots:
 
     void SelSlideItem( int row );
     void SelToolItem( int btn );
-
     void SearchChang( QString  text );
+    void SearchfocusOut();
     void ShowContextMenu( const QPoint &point );
 
 private:
