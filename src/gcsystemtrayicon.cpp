@@ -29,24 +29,24 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
     m_action2->setText( tr("Quit") );
     m_action2->setData( 2 );
 
-    m_action3->setText( tr("Option Configuration") );
+    m_action3->setText( "Option Configuration" );
     m_action3->setData( 3 );
     m_action3->setVisible( false );
 
 
-    m_action4->setText( tr("Main Window") );
+    m_action4->setText( tr("Main window") );
     m_action4->setData( 4 );
 
-    m_action5->setText( tr("Hidden suspension window"));
+    m_action5->setText( "Hidden suspension window");
     m_action5->setData( 5 );
 
-    m_action6->setText( tr("Show suspension window"));
+    m_action6->setText( "Show suspension window");
     m_action6->setData( 6 );
 
-    m_action7->setText( tr("Clear Aria2c Cache"));
+    m_action7->setText( "Clear Aria2c Cache" );
     m_action7->setData( 8 );
 
-    m_menu->addAction( m_action7 );
+    //m_menu->addAction( m_action7 );
     m_menu->addAction( m_action4 );
     m_menu->addAction( m_action5 );
     m_menu->addAction( m_action6 );

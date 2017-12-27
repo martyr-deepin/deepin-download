@@ -4,12 +4,6 @@
 <context>
     <name>AboutDlg</name>
     <message>
-        <location filename="../aboutdlg.cpp" line="26"/>
-        <location filename="../aboutdlg.cpp" line="49"/>
-        <source>About Deepin Downloade</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../aboutdlg.cpp" line="28"/>
         <source>Deepin Downloader is a built-in downloading tool of deepin operating system, supporting single and batch download.</source>
         <translation type="unfinished"></translation>
@@ -24,7 +18,7 @@
     </message>
     <message>
         <location filename="../downlistview.cpp" line="19"/>
-        <source>Process</source>
+        <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -37,12 +31,17 @@
         <source>Remaining time</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../downlistview.cpp" line="19"/>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GCMessageBox</name>
     <message>
         <location filename="../gcmessagebox.cpp" line="33"/>
-        <source>Cancel</source>
+        <source>Confirm</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -59,28 +58,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../gcsystemtrayicon.cpp" line="32"/>
-        <source>Option Configuration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../gcsystemtrayicon.cpp" line="37"/>
-        <source>Main Window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../gcsystemtrayicon.cpp" line="40"/>
-        <source>Hidden suspension window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../gcsystemtrayicon.cpp" line="43"/>
-        <source>Show suspension window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../gcsystemtrayicon.cpp" line="46"/>
-        <source>Clear Aria2c Cache</source>
+        <source>Main window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -103,7 +82,12 @@
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="184"/>
-        <source>深度下载</source>
+        <source>Deepin Downloader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="642"/>
+        <source>Operation failed！</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -112,47 +96,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="690"/>
+        <location filename="../mainwindow.cpp" line="688"/>
         <source>File deletion failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="849"/>
-        <source>Open BitTorrent File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="1063"/>
+        <location filename="../mainwindow.cpp" line="1061"/>
         <source>%1 tasks are processing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1288"/>
+        <location filename="../mainwindow.cpp" line="1286"/>
         <source>Paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1291"/>
+        <location filename="../mainwindow.cpp" line="1289"/>
         <source>Continue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1294"/>
+        <location filename="../mainwindow.cpp" line="1292"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1302"/>
+        <location filename="../mainwindow.cpp" line="1300"/>
         <source>Redownload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1305"/>
+        <location filename="../mainwindow.cpp" line="1303"/>
         <source>Show in folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1308"/>
+        <location filename="../mainwindow.cpp" line="1306"/>
         <source>Copy download link</source>
         <translation type="unfinished"></translation>
     </message>
@@ -172,6 +151,11 @@
     <message>
         <location filename="../newdown.cpp" line="69"/>
         <source>Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../newdown.cpp" line="157"/>
+        <source>The address cannot be analyzed, please retry!...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -206,13 +190,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../slidebar.cpp" line="20"/>
-        <source>History record</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../slidebar.cpp" line="22"/>
-        <source>recycle</source>
+        <location filename="../slidebar.cpp" line="21"/>
+        <source>Trash</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
