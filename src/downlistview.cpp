@@ -16,7 +16,7 @@ DownListView::DownListView( MainWindow *mainUI, QWidget *parent): QTableView( pa
 
     QStringList tbHeader;
     //tbHeader << "文件名" << "大小和进度" << "速度" << "剩余" << "状态" << "gid";
-    tbHeader << tr("File name") << tr("Process") << tr("Speed") << tr("Remaining time") << "status" << "gid";
+    tbHeader << tr("File name") << tr("Size") << tr("Speed") << tr("Remaining time") << tr("Status") << "gid";
 
     QList<TBItem> tbList;
 
@@ -125,11 +125,13 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
    //this->horizontalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
 
    /** 初始列宽定义 */
-   this->setColumnWidth( 0 ,420 );
-   this->setColumnWidth( 1 ,150 );
-   this->setColumnWidth( 3 ,250 );
+   this->setColumnWidth( 0 ,300 );
+   this->setColumnWidth( 1 ,100 );
+   this->setColumnWidth( 2 ,100 );
+   this->setColumnWidth( 3 ,100 );
+   this->setColumnWidth( 4 ,100 );
 
-   this->setColumnHidden( 4,true );
+   //this->setColumnHidden( 4,true );
    this->setColumnHidden( 5,true );
 
 
@@ -154,23 +156,27 @@ void DownListView::SetTableWidth( int MainWidth ){
 
     if ( MainWidth >= 1000 ){
 
-        int z0 = MainWidth * 0.45;
-        int z1 = MainWidth * 0.25;
-        int z3 = MainWidth - z0 - z1;// * 0.20;
-        //int z4 = MainWidth - z0 - z1 - z3;
+        int z0 = MainWidth * 0.30;
+        int z1 = MainWidth * 0.10;
+        int z2 = MainWidth * 0.10;
+        int z3 = MainWidth * 0.10;
+        int z4 = MainWidth - z0 - z1 - z3;
 
 
         this->setColumnWidth( 0 ,z0 );
         this->setColumnWidth( 1 ,z1 );
+        this->setColumnWidth( 2 ,z2 );
         this->setColumnWidth( 3 ,z3 );
-        //this->setColumnWidth( 4 ,z4 );
+        this->setColumnWidth( 4 ,z4 );
 
     }else{
 
-        this->setColumnWidth( 0 ,400 );
-        this->setColumnWidth( 1 ,120 );
+        this->setColumnWidth( 0 ,300 );
+        this->setColumnWidth( 1 ,100 );
+        this->setColumnWidth( 2 ,100 );
         this->setColumnWidth( 3 ,100 );
-        //this->setColumnWidth( 4 ,50 );
+        this->setColumnWidth( 4 ,100 );
+
     }
 
 }

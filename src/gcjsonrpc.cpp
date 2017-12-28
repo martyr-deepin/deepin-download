@@ -49,7 +49,6 @@ void GCJsonRPC::SendMessage( QString jsonrpc ,QString id ,QString method, QJsonA
     QNetworkReply  *UU = manager->post( *request, QJsonDocument( obj ).toJson() );
 
     //qDebug() << "51"<<UU->error()<<actionResult << UU->isRunning();
-
     QObject::connect( manager,
              &QNetworkAccessManager::finished,
              this,

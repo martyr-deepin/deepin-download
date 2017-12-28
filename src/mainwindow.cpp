@@ -181,7 +181,7 @@ void MainWindow::initMainWindow(){
     /**
      * 主窗口界面相关
      */
-    setWindowTitle(tr("深度下载"));
+    setWindowTitle( tr("Deepin Downloader"));
     setWindowIcon( QIcon(":Resources/images/logo@2x.png")  );
 
     /**
@@ -336,13 +336,13 @@ void MainWindow::SelSlideItem( int row ){
         //wThread->setFunction( 2 );
         break;
 
-    case 4:   // 历史记录
+    //case 4:   // 历史记录
         //wThread->setFunction( 0 );
-        toolbar->SetToolSearch();
-        GetDDList();
-        break;
+        //toolbar->SetToolSearch();
+        //GetDDList();
+        //break;
 
-    case 5:   // 回收站
+    case 4:   // 回收站
         qDebug()<< "回收站";
         RecycleList();
         break;
@@ -639,11 +639,9 @@ void MainWindow::OpenDownFile(){
                 //ShowMessageTip( "File " + SavePath + " No, it may have been deleted." );
                 if( errorbox ==  NULL ){
 
-                    errorbox = new GCMessageBox( this , SavePath.toStdString().data() ,tr("Target file removed or location changed") );
+                    errorbox = new GCMessageBox( this , tr("Operation failed！") ,tr("Target file removed or location changed") );
                     errorbox->show();
                 }
-
-
             }
         }
     }
@@ -846,7 +844,7 @@ void MainWindow::LoadStatusbar( QWidget *bottomWidget ){
 void MainWindow::AddBtFile(){
 
     QString path = QFileDialog::getOpenFileName(this,
-                                                tr("Open BitTorrent File"), ".", "BTorrent Files(*.torrent)" );
+                                                "Open BitTorrent File", ".", "BTorrent Files(*.torrent)" );
 
     if( path.length() != 0 ) {
 
@@ -1375,6 +1373,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                     RMenuItem[2]->setDisabled(true);
 
                     break;
+                /**
                 case 4:   //历史记录
                     RMenuItem[0]->setDisabled(true);
                     RMenuItem[1]->setDisabled(true);
@@ -1382,7 +1381,8 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                     RMenuItem[7]->setDisabled(false);
                     RMenuItem[8]->setDisabled(false);
                     break;
-                case 5:  //回收站
+                **/
+                case 4:  //回收站
                     RMenuItem[0]->setDisabled(true);
                     RMenuItem[1]->setDisabled(true);
                     RMenuItem[2]->setDisabled(true);

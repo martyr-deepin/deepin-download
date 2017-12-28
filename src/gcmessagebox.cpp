@@ -30,6 +30,6 @@ GCMessageBox::GCMessageBox(QWidget *parent ,QString title ,QString text ) :Dtk::
        label->setText(elidedTipStr);
 
        addContent(label);
-       addButton(tr("Cancel"), false);
+       addButton(tr("Confirm"), false);
         //addButton(tr("Delete"), true, DDialog::ButtonWarning);
 }

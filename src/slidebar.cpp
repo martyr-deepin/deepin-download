@@ -17,16 +17,16 @@ SlideBar::SlideBar(QListWidget *parent) : QListWidget(parent)
     selectDownloadingItem = new SlideItem("nav_downloading", tr("Downloading"));
     selectTaskItem = new SlideItem("task_pause", tr("Paused"));
     selectDoneItem = new SlideItem("nav_done", tr("Finished"));
-    selectfileItem = new SlideItem("file", tr("History record"));
-    //selectDocumentItem = new SlideItem("document", tr("全部任务"));
-    selectTrashItem = new SlideItem("trash", tr("recycle"));
+    //selectfileItem = new SlideItem("file", "History record");
+    selectTrashItem = new SlideItem("trash", tr("Trash"));
+
+
 
     addSlideItem(selectAllItem);
     addSlideItem(selectDownloadingItem);
     addSlideItem(selectTaskItem);
     addSlideItem(selectDoneItem);
-    addSlideItem(selectfileItem);
-    //addSlideItem(selectDocumentItem);
+    //addSlideItem(selectfileItem);
     addSlideItem(selectTrashItem);
 
     setFixedWidth(200);
@@ -36,6 +36,9 @@ SlideBar::SlideBar(QListWidget *parent) : QListWidget(parent)
     connect(this, &SlideBar::currentRowChanged, this, &SlideBar::monitorActiveItem);
     
     setCurrentRow(0);
+
+
+
 }
 
 SlideBar::~SlideBar(){
@@ -58,13 +61,13 @@ void SlideBar::monitorActiveItem(int activeItemRow)
         case 3:
             selectDoneItem->inactive();
             break;
-        case 4:
-            selectfileItem->inactive();
-            break;
+        //case 4:
+          //  selectfileItem->inactive();
+         //   break;
         /*case 5:
             selectDocumentItem->inactive();
             break;*/
-        case 5:
+        case 4:
             selectTrashItem->inactive();
             break;
         }
@@ -83,13 +86,13 @@ void SlideBar::monitorActiveItem(int activeItemRow)
     case 3:
         selectDoneItem->active();
         break;
-    case 4:
-        selectfileItem->active();
-        break;
+    //case 4:
+    //    selectfileItem->active();
+     //   break;
     /*case 5:
         selectDocumentItem->active();
         break;*/
-    case 5:
+    case 4:
         selectTrashItem->active();
         break;
     }

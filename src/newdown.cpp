@@ -154,7 +154,7 @@ int NewDown::Button2Click(){
                   //QMessageBox::information( NULL, "",   url );
                   if( url == "" ){
                       //【您输入的地址不能被正确解析，请重试！】【The address cannot be analyzed, please retry!】
-                      this->msg->setText( "The address cannot be analyzed, please retry!..." );
+                      this->msg->setText( tr("The address cannot be analyzed, please retry!...") );
                       return -1;
                   }
               }
