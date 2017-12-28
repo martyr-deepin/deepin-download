@@ -539,9 +539,11 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
                 DeleteDownFileDB();
                 break;
 
-             case 9: //缓存清理
+             case 9: //清空回收站
                 //DeleteDownFileDB();
-                RemoveAria2Cache();                
+                //RemoveAria2Cache();
+                qDebug() << "清空回收站";
+
                 break;
 
              default:
@@ -685,8 +687,17 @@ void MainWindow::DeleteDownFileDB(){
                 //ShowMessageTip( filePath + " File deletion failure" );
                 if( errorbox == NULL){
 
-                    errorbox = new GCMessageBox( this ,filePath , tr("File deletion failure") );
-                    errorbox->show();
+
+                    QFileInfo dfile( filePath );
+                    if ( dfile.isFile() ){
+
+                        errorbox = new GCMessageBox( this ,tr("Operation failed！") , tr("Target file removed or location changed") );
+                        errorbox->show();
+                    }else{
+
+                        errorbox = new GCMessageBox( this ,tr("Failed to delete") , tr("You do not have permission to delete %1").arg(filePath ) );
+                        errorbox->show();
+                    }
 
                 }else{
 
@@ -1014,7 +1025,8 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
            t.gid = tbitem.gid;
            t.type = 4 ;   //4 标注已完成
            downDB->SetDTaskStatus( t );
-           ShowMessageTip( "Completed " + tbitem.uri  );
+           //%1 has been downloaded successfully
+           ShowMessageTip( tr("%1 has been downloaded successfully").arg( tbitem.uri )  );
         }        
     }
 }
@@ -1032,6 +1044,7 @@ void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
     downListView->ClearAllItem();
 
     int acount = 0;
+    int zcount = 0;
     for( int i = 0 ; i < tbList.size() ; i++  ){
 
         downListView->InsertItem( i,tbList.at(i) );
@@ -1044,6 +1057,8 @@ void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
 
             acount++;
         }
+        zcount++;
+        //tr("Deleted");
     }
 
     /**
@@ -1056,12 +1071,22 @@ void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
     }
     downListView->selectionModel()->select( sel ,QItemSelectionModel::Select|QItemSelectionModel::Rows );
 
-    if( acount != 0 ){
+    if( acount >= 1 && zcount >= 1  ){
 
-        SetBottomStatusText( tr("%1 tasks are processing").arg( acount ) );
+        if( acount == 1 ){
+
+            SetBottomStatusText( tr("%1 task is processing").arg( acount ) +"       " + tr("total %1 task(s)").arg( zcount )  );
+
+        }else{
+
+            SetBottomStatusText( tr("%1 tasks are processing").arg( acount ) +"     " + tr("total %1 task(s)").arg( zcount ) );
+        }
+
+
     }else{
 
-        SetBottomStatusText( "" );
+        //total %1 task(s)
+        SetBottomStatusText( tr("total %1 task(s)").arg( zcount ) );
     }
 
 }
@@ -1089,6 +1114,8 @@ void MainWindow::RecycleList(){
         x.uri = filename;
         x.gid  = t.at(i).gid;
         x.Progress = "0";
+        x.State = tr( "Deleted" ); //已删除
+
         this->downListView->InsertItem( i,x );
     }
 
@@ -1279,11 +1306,11 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         qDebug() << "ROW ======> " << modelindex.row() + 1;
 
 
-        QAction *RMenuItem[8];
+        QAction *RMenuItem[10];
 
         downListView->m_ContextMenu->clear();
 
-        RMenuItem[0] =  new QAction( tr("Paused") ,this);     //暂停
+        RMenuItem[0] =  new QAction( tr("Pause") ,this);     //暂停
         RMenuItem[0]->setData( "1");
 
         RMenuItem[1] = new QAction( tr("Continue") ,this);    //继续
@@ -1306,11 +1333,31 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         RMenuItem[6] = new QAction( tr("Copy download link") ,this);       //复制下载链接
         RMenuItem[6]->setData( "7");
 
-        RMenuItem[7] = new QAction( "Delete download records" ,this);  //删除下载记录
+        RMenuItem[7] = new QAction( "Delete download records" ,this);      //删除下载记录
         RMenuItem[7]->setData( "8");
 
-        RMenuItem[8] = new QAction( "Clean up caching" ,this);         //清除Aria2c 缓存记录
+        RMenuItem[8] = new QAction( tr("Empty Trash") ,this);              //清空回收站
         RMenuItem[8]->setData( "9");
+
+/**
+        排序Sort by
+        按时间Time
+        按文件名 Name
+        按文件大小 Size
+        按状态 Status
+**/
+
+        QMenu  *sortbyMenu;
+        QAction *sortTime = new QAction( tr("Time"),this); //按时间Time
+        QAction *sortName = new QAction( tr("Name"),this); //按文件名 Name
+        QAction *sortSize = new QAction( tr("Size"),this); //按文件大小 Size
+        QAction *sortStatus = new QAction( tr("Status"),this);//按状态 Status
+
+        sortbyMenu = downListView->m_ContextMenu->addMenu( tr("Sort by") );
+        sortbyMenu->addAction( sortTime );
+        sortbyMenu->addAction( sortName );
+        sortbyMenu->addAction( sortSize );
+        sortbyMenu->addAction( sortStatus );
 
 
         for( int i = 0 ; i < 9 ; i++){
@@ -1319,7 +1366,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
 
         RMenuItem[3]->setVisible( false );
         RMenuItem[7]->setVisible( false );
-        RMenuItem[8]->setVisible( false );
+        //RMenuItem[8]->setVisible( false );
 
         /**
          *

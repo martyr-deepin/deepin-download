@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     app.loadTranslator();
     app.setOrganizationName("deepin");
     app.setApplicationName("deepin-download");
-    app.setApplicationDisplayName(QObject::tr("deepin-download"));
+    app.setApplicationDisplayName(QObject::tr("Deepin Downloader"));
     app.setApplicationVersion("1.0");
     app.loadTranslator();
 
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
     const QString acknowledgementLink = "https://www.deepin.org/acknowledgments/deepin-download";
     app.setProductIcon(QPixmap::fromImage(QImage(Utils::getQrcPath("logo_24.svg"))));
-    app.setProductName(DApplication::translate("MainWindow", "Deepin Download"));
+    app.setProductName(DApplication::translate("MainWindow", "Deepin Downloader"));
     app.setApplicationDescription(DApplication::translate("MainWindow", descriptionText) + "\n");
     app.setApplicationAcknowledgementPage(acknowledgementLink);
     app.setWindowIcon(QIcon(Utils::getQrcPath("logo_24.svg")));
