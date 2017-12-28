@@ -28,14 +28,14 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
 
     //允许右键表格
     this->setContextMenuPolicy( Qt::CustomContextMenu );
-
+/*
     //右键激活菜单
     connect( this,
              SIGNAL( customContextMenuRequested( QPoint )),
              this,
              SLOT( ShowContextMenu( QPoint )) );
 
-/*
+
     //单击
     connect( this,
              SIGNAL(clicked(QModelIndex)),
@@ -150,23 +150,27 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
 
 void DownListView::SetTableWidth( int MainWidth ){
 
-/**
-    this->setColumnWidth( 0 ,420 );
-    this->setColumnWidth( 1 ,150 );
-    this->setColumnWidth( 3 ,250 );
-**/
-    int z0 = MainWidth * 0.5;
-    int z1 = MainWidth * 0.25;
-    int z3 = MainWidth - z0 - z1;
+    //qDebug() << "new Width " << z0;
 
-    qDebug() << "new Width " << z0;
+    if ( MainWidth >= 1000 ){
 
-    if ( z0 >= 400 && z1 >= 100 && z3 >= 200 ){
+        int z0 = MainWidth * 0.45;
+        int z1 = MainWidth * 0.25;
+        int z3 = MainWidth - z0 - z1;// * 0.20;
+        //int z4 = MainWidth - z0 - z1 - z3;
+
 
         this->setColumnWidth( 0 ,z0 );
         this->setColumnWidth( 1 ,z1 );
         this->setColumnWidth( 3 ,z3 );
+        //this->setColumnWidth( 4 ,z4 );
 
+    }else{
+
+        this->setColumnWidth( 0 ,400 );
+        this->setColumnWidth( 1 ,120 );
+        this->setColumnWidth( 3 ,100 );
+        //this->setColumnWidth( 4 ,50 );
     }
 
 }
@@ -223,7 +227,15 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
 
 
     SetItemData( row, 0,  filename );
-    SetItemData( row, 1,  tbitem.Progress + " %");
+    if( tbitem.Progress == "0" ){
+
+        SetItemData( row, 1,  "");
+    }else{
+
+        SetItemData( row, 1,  tbitem.Progress + " %");
+    }
+
+
     SetItemData( row, 2,  Speed );
     SetItemData( row, 3,  RestTime );
     SetItemData( row, 4,  tbitem.State );
@@ -383,7 +395,7 @@ void DownListView::ShowContextMenu( const QPoint &point ){
                 RMenuItem[1]->setDisabled(true);
                 RMenuItem[2]->setDisabled(true);
                 break;
-            case 5:
+            case 5:  //回收站
                 break;
             case 6:
                 break;

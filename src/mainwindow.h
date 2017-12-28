@@ -113,6 +113,7 @@ private:
     DownListView     *downListView;
     GCSystemTrayIcon *systemTrayIcon;   //状态栏（托盘 ）
     GCStatusBar      *statusBar;
+    //QMenu            *m_ContextMenu;
 
     void LoadTableView( QWidget *centerWidget );
     void LoadSlideBar( QWidget *leftWidget );
@@ -193,6 +194,7 @@ private slots:
 
     void GetWaitList();
     void GetDDList();
+    void RecycleList();
     void GetStopList();
     void GetActiveList();
     void UpdateDownStatus();
@@ -201,6 +203,7 @@ private slots:
     void SelToolItem( int btn );
 
     void SearchChang( QString  text );
+    void ShowContextMenu( const QPoint &point );
 
 private:
 

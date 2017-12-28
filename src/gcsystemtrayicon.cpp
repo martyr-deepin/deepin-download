@@ -3,10 +3,10 @@
 GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
 
 
-    /** 气泡窗　暂弃用
+    /** 气泡窗　暂弃用**/
     m_tooltip =  new GCToolTips;
     m_tooltip->ShowMessage( "测试启动" );
-    **/
+
 
 
 
@@ -19,6 +19,8 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
 
     QAction *m_action5 = new QAction( m_menu );
     QAction *m_action6 = new QAction( m_menu );
+
+    QAction *m_action7 = new QAction( m_menu );
 
 
     m_action1->setText( tr("about") );
@@ -41,12 +43,17 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
     m_action6->setText( tr("Show suspension window"));
     m_action6->setData( 6 );
 
+    m_action7->setText( tr("Clear Aria2c Cache"));
+    m_action7->setData( 8 );
+
+    m_menu->addAction( m_action7 );
     m_menu->addAction( m_action4 );
     m_menu->addAction( m_action5 );
     m_menu->addAction( m_action6 );
     m_menu->addAction( m_action3 );
     m_menu->addAction( m_action1 );
     m_menu->addAction( m_action2 );
+
 
     m_action3->setVisible( false );
     m_action5->setVisible( false );

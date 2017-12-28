@@ -11,8 +11,6 @@
 #include "downrecord.h"
 
 
-
-
 class SQLiteFunt
 {
 public:
@@ -24,10 +22,11 @@ public:
     void AppendBTask( TBItem tbItem );
     void DeleteDTask( QString gid  );
     QList<DDRecord> ReadALLTask();
+    QList<DDRecord> ReadRecycleList();
     QList<DDRecord> ReadDDTask( int type = 4);
     DDRecord GetDTaskInfo( QString gid );
+
     void SetDTaskGid( DDRecord t );
-    //void SetDTaskType( DDRecord d  );
     void SetDTaskStatus( DDRecord d );
 
     bool findATaskI( QString urlStr );

@@ -22,11 +22,11 @@ struct TBItem {
 */
 struct DDRecord {
 
-    QString id;
+    int id;
     QString url;
     QString gid;
-    QString type;
-    QString classn;
+    int type;
+    int classn;
     QString savepath;
 
 };
