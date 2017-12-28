@@ -21,44 +21,29 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) :Dtk::Widget::DDialog(par
     setTitle( tr("New task") );
 
 
-
     QWidget *form = new QWidget;
     QVBoxLayout  *vbLayout = new QVBoxLayout;
-
     form->setLayout( vbLayout );
-
     Edit1 = new QTextEdit;
     Edit1->setFixedHeight( 240 );
     Edit1->setStyleSheet("QTextEdit{border:1px solid #f3f3f3;}");
-
     QPushButton *openFileDlg = new QPushButton( "torrent　|　metalink　Down file" );
+
+    QWidget *SaveSetup = new QWidget;
+    QFormLayout *SS = new QFormLayout;
+    SaveSetup->setLayout( SS );
+    QLabel *text = new QLabel(tr("Save to"));
+    QComboBox *text2 = new QComboBox;
+    QString HomeDir = QDir::homePath();
+    QString Downloads = HomeDir + "/Downloads";
+    //QString Desktop = HomeDir + "/Downloads";
+    text2->addItem( tr("Downloads"),Downloads  );
+    //text2->addItem( "桌面",Downloads  );
+    SS->addRow( text ,text2);
 
     vbLayout->addWidget( Edit1 );
     vbLayout->addWidget( openFileDlg );
-
-    /**
-     * @brief buttonGroup
-     * 文案：
-【新建任务】【New task】
-【您输入的地址不能被正确解析，请重试！】【The address cannot be analyzed, please retry!】
-【保存位置】【Save to】
-【取消】【Cancel】
-【开始下载】【Download】
-     */
-    /**
-    QWidget *buttonGroup = new QWidget;
-    QHBoxLayout *Blayout = new QHBoxLayout;
-    QPushButton *button1 = new QPushButton( tr("Cancel") );
-    QPushButton *button2 = new QPushButton( tr("Download") );
-
-
-    //QPushButton *button3 = new QPushButton("测试");
-
-    Blayout->addWidget( button1 );
-    Blayout->addWidget( button2 );
-    **/
-
-    //buttonGroup->setLayout( Blayout );
+    vbLayout->addWidget( SaveSetup );
 
     msg = new QLabel;
     msg->setText("");
@@ -154,7 +139,7 @@ int NewDown::Button2Click(){
                   //QMessageBox::information( NULL, "",   url );
                   if( url == "" ){
                       //【您输入的地址不能被正确解析，请重试！】【The address cannot be analyzed, please retry!】
-                      this->msg->setText( tr("The address cannot be analyzed, please retry!...") );
+                      this->msg->setText( tr("The address cannot be analyzed, please retry!") );
                       return -1;
                   }
               }

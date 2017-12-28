@@ -5,10 +5,7 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
 
     /** 气泡窗　暂弃用**/
     m_tooltip =  new GCToolTips;
-    m_tooltip->ShowMessage( "" );
-
-
-
+    //m_tooltip->ShowMessage( "" );
 
     //托盘菜单
     m_menu = new QMenu;
@@ -26,7 +23,7 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
     m_action1->setText( tr("About") );
     m_action1->setData( 1 );
 
-    m_action2->setText( tr("Quit") );
+    m_action2->setText( tr("Exit") );
     m_action2->setData( 2 );
 
     m_action3->setText( "Option Configuration" );
@@ -66,7 +63,7 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
 
     //新建托盘要显示的icon
     this->setIcon( QIcon(":Resources/images/logo@2x.png") );
-    this->setToolTip( tr("deepin download") );
+    this->setToolTip( tr("Deepin Downloader") );
     this->show();    
 
     //connect(this, &QSystemTrayIcon::activated, this, &GCSystemTrayIcon::ActiveTray);//点击托盘，执行相应的动作

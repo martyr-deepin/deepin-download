@@ -31,5 +31,5 @@ GCMessageBox::GCMessageBox(QWidget *parent ,QString title ,QString text ) :Dtk::
 
        addContent(label);
        addButton(tr("Confirm"), false);
-        //addButton(tr("Delete"), true, DDialog::ButtonWarning);
+       //addButton(tr("Delete"), true, DDialog::ButtonWarning);
 }
