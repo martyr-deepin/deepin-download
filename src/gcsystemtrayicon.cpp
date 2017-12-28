@@ -5,7 +5,7 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
 
     /** 气泡窗　暂弃用**/
     m_tooltip =  new GCToolTips;
-    m_tooltip->ShowMessage( "测试启动" );
+    m_tooltip->ShowMessage( "" );
 
 
 
@@ -23,7 +23,7 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
     QAction *m_action7 = new QAction( m_menu );
 
 
-    m_action1->setText( tr("about") );
+    m_action1->setText( tr("About") );
     m_action1->setData( 1 );
 
     m_action2->setText( tr("Quit") );

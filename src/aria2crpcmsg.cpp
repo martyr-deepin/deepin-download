@@ -2281,7 +2281,7 @@ void Aria2cRPCMsg::ReturnError( QString error_t ){
 
     if( this->Errot_U < 3 ){
 
-        mainUI->ShowMessageTip(  "与Aria2 通讯失败.." );
+        //mainUI->ShowMessageTip(  "与Aria2 通讯失败.." );
         this->Errot_U++;
     }
 }

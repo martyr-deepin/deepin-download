@@ -7,11 +7,12 @@
 #include <QPushButton>
 #include <QTextEdit>
 //#include <QLineEdit>
+#include <ddialog.h>
 
 class MainWindow;
 #include "mainwindow.h"
 
-class NewDown : public QDialog
+class NewDown : public Dtk::Widget::DDialog
 {
     Q_OBJECT
 public:
@@ -30,13 +31,15 @@ private:
 
 signals:
 
+
+
 private slots:
 
     void Button1Click();
-    void Button2Click();
+    int  Button2Click();
     void Button3Click();
     void openFileDlg();
-
+    void buttonClicked(int index, const QString &text);
 };
 
 #endif // NEWDOWN_H

@@ -16,7 +16,7 @@ DownListView::DownListView( MainWindow *mainUI, QWidget *parent): QTableView( pa
 
     QStringList tbHeader;
     //tbHeader << "文件名" << "大小和进度" << "速度" << "剩余" << "状态" << "gid";
-    tbHeader << tr("File name") << tr("Size and Process") << tr("Speed") << tr("Remaining time") << "status" << "gid";
+    tbHeader << tr("File name") << tr("Process") << tr("Speed") << tr("Remaining time") << "status" << "gid";
 
     QList<TBItem> tbList;
 
@@ -315,6 +315,7 @@ void DownListView::ClearAllItem(){
 
 void DownListView::ShowContextMenu( const QPoint &point ){
 
+    /**
     qDebug() << "ShowContextMenu: " << point;
 
     QModelIndex  modelindex = this->indexAt( point );    
@@ -342,7 +343,7 @@ void DownListView::ShowContextMenu( const QPoint &point ){
     RMenuItem[4] = new QAction( tr("Redownload") ,this);
     RMenuItem[4]->setData( "5");
 
-    RMenuItem[5] = new QAction( tr("Open the folder") ,this);
+    RMenuItem[5] = new QAction( tr("Show in folder") ,this);
     RMenuItem[5]->setData( "6");
 
     RMenuItem[6] = new QAction( tr("Copy download link") ,this);
@@ -406,7 +407,7 @@ void DownListView::ShowContextMenu( const QPoint &point ){
         }
 
     m_ContextMenu->exec( QCursor::pos() ); // 当前鼠标位置
-
+    **/
 }
 
 void DownListView::view_sort(int column) {

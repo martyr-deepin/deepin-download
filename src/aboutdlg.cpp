@@ -23,7 +23,7 @@ AboutDlg::AboutDlg(QWidget *parent) : QDialog(parent){
 
    QWidget *TL = new QWidget;
    QVBoxLayout *yBox = new QVBoxLayout;
-   QLabel *H1 = new QLabel("关于 深度下载");
+   QLabel *H1 = new QLabel(tr("About Deepin Downloade"));
    QLabel *HH1 = new QLabel("");
    QLabel *HH2 = new QLabel( tr("Deepin Downloader is a built-in downloading tool of deepin operating system, supporting single and batch download."));
    HH2->setGeometry(QRect(328, 240, 329, 27*4));  //四倍行距
@@ -46,7 +46,7 @@ AboutDlg::AboutDlg(QWidget *parent) : QDialog(parent){
    xyBox->addWidget( TL );
 
    setFixedSize( 640,280 );
-   setWindowTitle( "关于 深度下载" );
+   setWindowTitle( tr("About Deepin Downloade") );
 
 
 }

@@ -31,8 +31,12 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
+#include <QDBusInterface>
+#include <QDBusMessage>
+
 #include "sqlitefunt.h"
 #include "interfaceadaptor.h"
+#include "gcmessagebox.h"
 
 /** */
 #include "dthememanager.h"
@@ -57,6 +61,8 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::initMainWindow(){
+
+
 
     /**
      *  初始化 aria2c 接口
@@ -124,10 +130,10 @@ void MainWindow::initMainWindow(){
     aboutDlg  = new AboutDlg;
 
     /** 浮窗 */
-    /***
-    mwm  = new MWM( this );
-    mwm->ShowMWM();
-    ***/
+
+    //mwm  = new MWM( this );
+    //mwm->ShowMWM();
+
 
     /** 启用文件拖入支持 */
     this->setAcceptDrops( true );
@@ -157,7 +163,7 @@ void MainWindow::initMainWindow(){
     connect( slidebar, SIGNAL(SelSlideItem( int)), this, SLOT( SelSlideItem( int) ) );
     connect( toolbar, SIGNAL(SelToolItem( int)), this, SLOT( SelToolItem( int) ) );
     connect( toolbar, SIGNAL(SearchChang( QString )), this, SLOT( SearchChang( QString ) ) );
-
+    connect( toolbar, SIGNAL(SearchfocusOut()), this, SLOT( SearchfocusOut() ) );
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -255,7 +261,8 @@ void MainWindow::SelToolItem( int btn ){
 
     switch ( btn  ) {
         case 1:  // 普通URI 下载
-            newDownDlg->show();
+
+            newDownDlg->exec();
             break;
         case 2:  // BT 种子文件
             AddBtFile();
@@ -276,6 +283,13 @@ void MainWindow::SelToolItem( int btn ){
             Remove();
             break;
 
+        case 7:
+            if( toolbar->toolsG != NULL && toolbar->searchedit != NULL){
+
+                toolbar->toolsG->setVisible( false );
+                toolbar->searchedit->setVisible( true );
+            }
+            break;
         default:
             break;
     }
@@ -580,6 +594,7 @@ void MainWindow::AgainDown(){
 
 void MainWindow::CopyUrlToBoard(){
 
+    GCMessageBox *errorbox;
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
     foreach( const QModelIndex & index, selected){
 
@@ -588,7 +603,16 @@ void MainWindow::CopyUrlToBoard(){
 
             QString URL = downDB->GetDownUrlPath( gid );
             if( URL == "" ){
-              ShowMessageTip( tr("Failed to get the original address, the download record may have been deleted artificially") );
+
+                //ShowMessageTip( "Failed to get the original address, the download record may have been deleted artificially" );
+                /**
+                if( errorbox == NULL){
+
+                    errorbox = new GCMessageBox( this , "" ,tr("Target file removed or location changed") );
+                    errorbox->exec();
+                }
+                **/
+
             }else{
               ShowMessageTip( URL );
               board->setText(  URL );
@@ -599,6 +623,7 @@ void MainWindow::CopyUrlToBoard(){
 
 void MainWindow::OpenDownFile(){
 
+    GCMessageBox *errorbox;
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
     foreach( const QModelIndex & index, selected){
 
@@ -611,7 +636,14 @@ void MainWindow::OpenDownFile(){
             if( spathInfo.isFile() ){
                 OpenDownFilePath( SavePath );
             }else{
-                ShowMessageTip( tr("File ") + SavePath + tr(" No, it may have been deleted.") );
+                //ShowMessageTip( "File " + SavePath + " No, it may have been deleted." );
+                if( errorbox ==  NULL ){
+
+                    errorbox = new GCMessageBox( this , SavePath.toStdString().data() ,tr("Target file removed or location changed") );
+                    errorbox->show();
+                }
+
+
             }
         }
     }
@@ -640,6 +672,8 @@ void MainWindow::RemoveAria2Cache(){
 */
 void MainWindow::DeleteDownFileDB(){
 
+    GCMessageBox *errorbox;
+    int errorCount = 0;
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
     foreach( const QModelIndex & index, selected){
 
@@ -650,7 +684,17 @@ void MainWindow::DeleteDownFileDB(){
 
             if ( ! QFile::remove( filePath ) ){
 
-                ShowMessageTip( filePath + tr(" File deletion failure") );
+                //ShowMessageTip( filePath + " File deletion failure" );
+                if( errorbox == NULL){
+
+                    errorbox = new GCMessageBox( this ,filePath , tr("File deletion failure") );
+                    errorbox->show();
+
+                }else{
+
+                    errorCount++;
+                }
+
             }
             downDB->DeleteDTask( gid );
         }
@@ -660,6 +704,7 @@ void MainWindow::DeleteDownFileDB(){
 }
 
 void MainWindow::Remove(){
+
 
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
 
@@ -678,6 +723,9 @@ void MainWindow::Remove(){
         }
 
     }
+
+
+
 }
 
 /**
@@ -810,7 +858,7 @@ void MainWindow::AddBtFile(){
 void MainWindow::AddMetalinkFile(){
 
     QString path = QFileDialog::getOpenFileName(this,
-                                                tr("Open Metalink File"), ".", "Metalink File(*.metalink)");
+                                                "Open Metalink File", ".", "Metalink File(*.metalink)");
 
     if( path.length() != 0 ) {
 
@@ -833,7 +881,7 @@ void MainWindow::AppendDownUrl( QString urlStr  ){
 
    QString ID = downDB->AppendDTask(  urlStr );  //添加数据库记录
    aria2c->SendMsgAria2c_addUri( urlStr ,ID  );
-   ShowMessageTip( tr("Join a new task：") + urlStr  );
+   ShowMessageTip( "Join a new task：" + urlStr  );
    slidebar->SetSelectRow( 1 );
 
 }
@@ -842,7 +890,7 @@ void MainWindow::AppendDownBT( QString btfilepath   ){
 
     QString ID = downDB->AppendDTask(  btfilepath ,"2" ); //添加数据库记录
     aria2c->SendMsgAria2c_addTorrent( btfilepath ,ID  );
-    ShowMessageTip( tr("Enable：") + btfilepath  );
+    ShowMessageTip( "Enable：" + btfilepath  );
     //slideBar->SetSelectRow( 1 );
 }
 
@@ -850,7 +898,7 @@ void MainWindow::AppendDownMetalink( QString Metalinkfilepath   ){
 
     QString ID = downDB->AppendDTask(  Metalinkfilepath ,"3" ); //添加数据库记录
     aria2c->SendMsgAria2c_addMetalink( Metalinkfilepath ,ID );
-    ShowMessageTip( tr("Enable： ") + Metalinkfilepath  );
+    ShowMessageTip( "Enable： " + Metalinkfilepath  );
     //slideBar->SetSelectRow( 1 );
 }
 
@@ -921,6 +969,9 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
 
     if( this->GetSlideSelRow() == 0  ){
 
+        /** 记录下此时 listView 中已选择的行 */
+        const QModelIndexList selected = downListView->selectionModel()->selectedRows();
+
         bool findN = false;
         for( int i = 0 ; i < downListView->m_dataModel->rowCount();i++ ){
 
@@ -939,8 +990,20 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
 
         if( ! findN ){
 
+
             downListView->InsertItem( downListView->m_dataModel->rowCount() ,tbitem );
         }
+
+        /**
+         * 恢复此前 listView 已选择行的高亮
+         */
+        QItemSelection sel;
+        foreach( const QModelIndex & index, selected){
+            QItemSelectionRange readSel( index );
+            sel.append( readSel );
+        }
+        downListView->selectionModel()->select( sel ,QItemSelectionModel::Select|QItemSelectionModel::Rows );
+
     }
 
     /** 在数据库表中记录 已完成的任务 */
@@ -953,7 +1016,7 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
            t.gid = tbitem.gid;
            t.type = 4 ;   //4 标注已完成
            downDB->SetDTaskStatus( t );
-           ShowMessageTip( tr("Completed ") + tbitem.uri  );
+           ShowMessageTip( "Completed " + tbitem.uri  );
         }        
     }
 }
@@ -970,7 +1033,7 @@ void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
 
     downListView->ClearAllItem();
 
-
+    int acount = 0;
     for( int i = 0 ; i < tbList.size() ; i++  ){
 
         downListView->InsertItem( i,tbList.at(i) );
@@ -978,6 +1041,11 @@ void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
         downDB->SetDownSavePath( tbList.at(i).gid ,tbList.at(i).savepath );
 
         downDB->AppendBTask( tbList.at(i) );
+
+        if( tbList.at(i).State == "active" ){
+
+            acount++;
+        }
     }
 
     /**
@@ -989,6 +1057,15 @@ void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
         sel.append( readSel );
     }
     downListView->selectionModel()->select( sel ,QItemSelectionModel::Select|QItemSelectionModel::Rows );
+
+    if( acount != 0 ){
+
+        SetBottomStatusText( tr("%1 tasks are processing").arg( acount ) );
+    }else{
+
+        SetBottomStatusText( "" );
+    }
+
 }
 
 
@@ -1082,8 +1159,10 @@ void MainWindow::UpdateMWM( QString text ){
 
 void MainWindow::ShowMessageTip( QString text ){
 
-   /**  右下角气泡消息窗口　暂弃用 */
-   systemTrayIcon->m_tooltip->ShowMessage( text  );
+   /**  右下角气泡消息窗口　暂弃用 */    
+   //systemTrayIcon->m_tooltip->ShowMessage( text  );
+
+   notifyActivator( "", text );
 }
 
 void MainWindow::OPenDownUrlDlg( QString DownFileUrl ){
@@ -1175,6 +1254,24 @@ void MainWindow::SearchChang( QString  text ) {
 
 }
 
+void MainWindow::SearchfocusOut(){
+
+    qDebug() << "MainWindow::SearchfocusOut " ;
+
+    //if( text.trimmed().length() == 0 ){
+
+        qDebug() << "搜索框已清空";
+
+        if( toolbar->toolsG != NULL && toolbar->searchedit != NULL){
+
+            toolbar->toolsG->setVisible( true );
+            toolbar->searchedit->setVisible( false );
+        }
+
+    //}
+
+}
+
 
 void MainWindow::ShowContextMenu( const QPoint &point ){
 
@@ -1194,10 +1291,10 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         RMenuItem[1] = new QAction( tr("Continue") ,this);    //继续
         RMenuItem[1]->setData( "2");
 
-        RMenuItem[2] = new QAction( tr("Remove") ,this);      //删除
+        RMenuItem[2] = new QAction( tr("Delete") ,this);      //删除 Remove
         RMenuItem[2]->setData( "3");
 
-        RMenuItem[3] = new QAction( tr("property") ,this);    //属性
+        RMenuItem[3] = new QAction( "property" ,this);    //属性
         RMenuItem[3]->setData( "4");
 
         downListView->m_ContextMenu->addSeparator();
@@ -1211,10 +1308,10 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         RMenuItem[6] = new QAction( tr("Copy download link") ,this);       //复制下载链接
         RMenuItem[6]->setData( "7");
 
-        RMenuItem[7] = new QAction( tr("Delete download records") ,this);  //删除下载记录
+        RMenuItem[7] = new QAction( "Delete download records" ,this);  //删除下载记录
         RMenuItem[7]->setData( "8");
 
-        RMenuItem[8] = new QAction( tr("Clean up caching") ,this);         //清除Aria2c 缓存记录
+        RMenuItem[8] = new QAction( "Clean up caching" ,this);         //清除Aria2c 缓存记录
         RMenuItem[8]->setData( "9");
 
 
@@ -1223,6 +1320,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         }
 
         RMenuItem[3]->setVisible( false );
+        RMenuItem[7]->setVisible( false );
         RMenuItem[8]->setVisible( false );
 
         /**
@@ -1378,6 +1476,7 @@ int MainWindow::initAria2cWork(){
         }
     }else{
         //qDebug() << "ariar2c 不在进程中...";
+        ShowMessageTip(  "ariar2c 不在进程中..." );
     }
 
     if ( pid != 0 ){
@@ -1431,6 +1530,8 @@ int MainWindow::initAria2cWork(){
 
         qDebug() << "发起进程" << ps->error() ;
 
+        ShowMessageTip(  "发起进程 ariar2c 进程中." + ps->error() );
+
      }
 
 
@@ -1439,6 +1540,48 @@ int MainWindow::initAria2cWork(){
 }
 
 
+void MainWindow::notifyActivator( QString title ,QString text )
+{
+    QStringList actions = QStringList() << "activate" << tr( title.toStdString().data() );
+    QList<QVariant> argumentList;
+    argumentList << "deepin-activator";
+    argumentList << static_cast<uint>(0);
+    argumentList << "deepin-activator";
+    argumentList << "";
+    argumentList << tr( text.toStdString().data() );
+    argumentList << actions;
+    argumentList << QVariantMap();
+    argumentList << static_cast<int>(1000);
+
+    static QDBusInterface notifyApp("org.freedesktop.Notifications",
+                                    "/org/freedesktop/Notifications",
+                                    "org.freedesktop.Notifications");
+
+    QDBusMessage reply = notifyApp.callWithArgumentList(QDBus::AutoDetect,
+                                                        "Notify",
+                                                        argumentList);
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+       qDebug() << "D-Bus Error:" << reply.errorMessage();
+    }
+
+   if (!QDBusConnection::sessionBus().isConnected()) {
+      qDebug() << "QDBusConnection::sessionBus().isConnected() failed";
+      return;
+   }
+
+  connect(&notifyApp,
+          SIGNAL(ActionInvoked(uint, QString)),
+          this,
+          SLOT(slotActionInvoked(uint, QString)));
+
+
+}
+
+void MainWindow::slotActionInvoked(uint id, QString action )
+{
+    Q_EMIT show();
+}
 
 
 
