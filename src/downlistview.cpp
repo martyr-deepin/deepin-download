@@ -145,8 +145,8 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
    m_ContextMenu = new QMenu();
 
    tableHead  = this->horizontalHeader();
-   tableHead->setSortIndicator(0,Qt::AscendingOrder);
-   tableHead->setSortIndicatorShown(true);
+   tableHead->setSortIndicator(1,Qt::AscendingOrder);
+   //tableHead->setSortIndicatorShown(true);
    connect( tableHead, SIGNAL(sectionClicked(int)), this, SLOT(view_sort(int)));
 }
 

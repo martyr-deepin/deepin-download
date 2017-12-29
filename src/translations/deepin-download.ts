@@ -110,19 +110,19 @@
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1078"/>
-        <source>%1 task is processing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="1078"/>
         <location filename="../mainwindow.cpp" line="1082"/>
         <location filename="../mainwindow.cpp" line="1089"/>
         <source>total %1 task(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mainwindow.cpp" line="1078"/>
+        <source>%1 task is processing,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../mainwindow.cpp" line="1082"/>
-        <source>%1 tasks are processing</source>
+        <source>%1 tasks are processing,</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -201,11 +201,6 @@
     <message>
         <location filename="../newdown.cpp" line="35"/>
         <source>Save to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../newdown.cpp" line="40"/>
-        <source>Downloads</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

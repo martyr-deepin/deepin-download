@@ -37,7 +37,7 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) :Dtk::Widget::DDialog(par
     QString HomeDir = QDir::homePath();
     QString Downloads = HomeDir + "/Downloads";
     //QString Desktop = HomeDir + "/Downloads";
-    text2->addItem( tr("Downloads"),Downloads  );
+    text2->addItem( "Downloads",Downloads  );
     //text2->addItem( "桌面",Downloads  );
     SS->addRow( text ,text2);
 

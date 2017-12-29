@@ -283,11 +283,12 @@ void MainWindow::SelToolItem( int btn ){
             Remove();
             break;
 
-        case 7:
+        case 7:  //搜索
             if( toolbar->toolsG != NULL && toolbar->searchedit != NULL){
 
                 toolbar->toolsG->setVisible( false );
-                toolbar->searchedit->setVisible( true );
+                toolbar->searchedit->setVisible( true );                
+                toolbar->searchedit->setFocus();
             }
             break;
         default:
@@ -1075,11 +1076,11 @@ void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
 
         if( acount == 1 ){
 
-            SetBottomStatusText( tr("%1 task is processing").arg( acount ) +"       " + tr("total %1 task(s)").arg( zcount )  );
+            SetBottomStatusText( tr("%1 task is processing,").arg( acount ) +" " + tr("total %1 task(s)").arg( zcount )  );
 
         }else{
 
-            SetBottomStatusText( tr("%1 tasks are processing").arg( acount ) +"     " + tr("total %1 task(s)").arg( zcount ) );
+            SetBottomStatusText( tr("%1 tasks are processing,").arg( acount ) +" " + tr("total %1 task(s)").arg( zcount ) );
         }
 
 
@@ -1353,18 +1354,22 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         QAction *sortSize = new QAction( tr("Size"),this); //按文件大小 Size
         QAction *sortStatus = new QAction( tr("Status"),this);//按状态 Status
 
-        sortbyMenu = downListView->m_ContextMenu->addMenu( tr("Sort by") );
-        sortbyMenu->addAction( sortTime );
-        sortbyMenu->addAction( sortName );
-        sortbyMenu->addAction( sortSize );
-        sortbyMenu->addAction( sortStatus );
-
-
         for( int i = 0 ; i < 9 ; i++){
+
+            if( i == 3 ){
+
+                sortbyMenu = downListView->m_ContextMenu->addMenu( tr("Sort by") );
+                sortbyMenu->addAction( sortTime );
+                sortbyMenu->addAction( sortName );
+                sortbyMenu->addAction( sortSize );
+                sortbyMenu->addAction( sortStatus );
+                continue;
+            }
+
             downListView->m_ContextMenu->addAction( RMenuItem[i]  );
         }
 
-        RMenuItem[3]->setVisible( false );
+        //RMenuItem[3]->setVisible( false );
         RMenuItem[7]->setVisible( false );
         //RMenuItem[8]->setVisible( false );
 

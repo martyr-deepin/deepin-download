@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("deepin-download");
     app.setApplicationDisplayName(QObject::tr("Deepin Downloader"));
     app.setApplicationVersion("1.0");
-    app.loadTranslator();
+    //app.loadTranslator();
 
 
     /**
