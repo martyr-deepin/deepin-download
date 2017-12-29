@@ -486,6 +486,54 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
     connect( downListView, &QTableView::clicked,this, [=](QModelIndex modelIndex ){
 
           qDebug() << "downListView.click: " << modelIndex;
+
+          QString status =  modelIndex.sibling( modelIndex.row(),4 ).data().toString();
+          qDebug() << "Select Status : " << status;
+
+          if( status == "active" ){   //活动
+
+              toolbar->tBtn4->setEnabled( false );
+              toolbar->tBtn5->setEnabled( true );
+              toolbar->tBtn6->setEnabled( true );
+
+
+          } else if ( status == "waiting" ){ //队列
+
+              toolbar->tBtn4->setEnabled( true );
+              toolbar->tBtn5->setEnabled( true );
+              toolbar->tBtn6->setEnabled( true );
+
+
+          } else if ( status == "paused" ){  //暂停
+
+              toolbar->tBtn4->setEnabled( true );
+              toolbar->tBtn5->setEnabled( false );
+              toolbar->tBtn6->setEnabled( true );
+
+
+          } else if ( status == "error" ){   //错误
+
+              toolbar->tBtn4->setEnabled( false );
+              toolbar->tBtn5->setEnabled( false );
+              toolbar->tBtn6->setEnabled( true );
+
+
+          } else if ( status == "complete" ){ //完成
+
+              toolbar->tBtn4->setEnabled( false );
+              toolbar->tBtn5->setEnabled( false );
+              toolbar->tBtn6->setEnabled( true );
+
+
+          } else if ( status == "removed" ){  //移除
+
+              toolbar->tBtn4->setEnabled( false );
+              toolbar->tBtn5->setEnabled( false );
+              toolbar->tBtn6->setEnabled( true );
+          }
+
+
+
     });
 
 
@@ -493,6 +541,9 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
 
           qDebug() <<"downListView.DoubleClick: " << modelIndex;
     });
+
+
+
 
     //右键激活菜单
     connect( downListView,
@@ -543,17 +594,56 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
              case 9: //清空回收站
                 //DeleteDownFileDB();
                 //RemoveAria2Cache();
-                qDebug() << "清空回收站";
-
+                //qDebug() << "清空回收站";
+                DeleteAllRecord();
                 break;
 
              default:
-                  break;
+
+                RightTMenu( action->data().toInt() );
+                break;
           }
 
     });
 
 }
+
+void MainWindow::RightTMenu( int itemID ){
+
+    int column = 0;
+
+    switch( itemID ){
+
+    case 101:     //时间
+         break;
+    case 102:     //名字
+         column = 0;
+         break;
+    case 103:     //大小
+         column = 1;
+         break;
+    case 104:     //状态
+         column = 5;
+         break;
+    default:
+         break;
+
+    }
+
+
+    int i   = downListView->tableHead->sortIndicatorOrder();
+
+    if( 0 == i ) {
+
+        downListView->m_dataModel->sort(column, Qt::AscendingOrder);
+
+    }else {
+
+        downListView->m_dataModel->sort(column, Qt::DescendingOrder);
+    }
+
+}
+
 
 void MainWindow::Property(){
 
@@ -668,6 +758,45 @@ void MainWindow::RemoveAria2Cache(){
     **/
 }
 
+
+void MainWindow::DeleteAllRecord(){
+
+    //DeleteDownFileDB();
+    //RemoveAria2Cache();
+
+    QList<DDRecord> t = this->downDB->ReadRecycleList();
+    GCMessageBox *errorbox;
+    int errorCount = 0;
+    for( int i = 0 ; i < t.size() ; i++ ){
+
+        QString filePath =  t.at(i).savepath;
+
+        if ( ! QFile::remove( filePath ) ){
+
+            if( errorbox == NULL){
+
+                QFileInfo dfile( filePath );
+                if ( dfile.isFile() ){
+
+                    errorbox = new GCMessageBox( this ,tr("Operation failed！") , tr("Target file removed or location changed") );
+                    errorbox->show();
+                }else{
+
+                    errorbox = new GCMessageBox( this ,tr("Failed to delete") , tr("You do not have permission to delete %1").arg(filePath ) );
+                    errorbox->show();
+                }
+
+            }else{
+
+                errorCount++;
+            }
+        }
+    }
+
+    RecycleList();
+    downListView->ClearAllItem();
+}
+
 /**
 * 删除历史记录
 */
@@ -708,7 +837,7 @@ void MainWindow::DeleteDownFileDB(){
             }
             downDB->DeleteDTask( gid );
         }
-    }
+   }
 
    GetDDList();
 }
@@ -1350,9 +1479,15 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
 
         QMenu  *sortbyMenu;
         QAction *sortTime = new QAction( tr("Time"),this); //按时间Time
+        sortTime->setData("101");
         QAction *sortName = new QAction( tr("Name"),this); //按文件名 Name
+        sortName->setData("102");
         QAction *sortSize = new QAction( tr("Size"),this); //按文件大小 Size
+        sortSize->setData("103");
         QAction *sortStatus = new QAction( tr("Status"),this);//按状态 Status
+        sortStatus->setData("104");
+
+        //connect(   )
 
         for( int i = 0 ; i < 9 ; i++){
 
@@ -1374,7 +1509,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         //RMenuItem[8]->setVisible( false );
 
         /**
-         *
+         *  根据侧边栏选择项改变状态
          */
         ////////////////////////////////////////////////////////////////////////////
 
@@ -1387,18 +1522,6 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                 RMenuItem[i]->setDisabled( true );
             }
         }
-
-/*
-        bool x = false;
-        if( modelindex.row() < 0){
-
-            //x = true;
-            for( int i = 0 ; i < 9 ; i++ ){
-                RMenuItem[i]->setDisabled( x );
-            }
-        }
-*/
-
 
         qDebug() << "GetSelectRow: " << this->GetSlideSelRow();
 
@@ -1450,6 +1573,42 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                 default:
 
                     break;
+
+            }
+
+            /**
+             * 根据列表选择项改变状态
+             */
+            QModelIndex  modelIndex = this->downListView->indexAt( point );
+            QString status =  modelIndex.sibling( modelIndex.row(),4 ).data().toString();
+            qDebug() << "Select Status : " << status;
+
+            if( status == "active" ){   //活动
+
+                RMenuItem[0]->setEnabled( true );
+                RMenuItem[1]->setEnabled( false );
+
+            } else if ( status == "waiting" ){ //队列
+
+
+
+            } else if ( status == "paused" ){  //暂停
+
+                RMenuItem[0]->setEnabled( false );
+                RMenuItem[1]->setEnabled( true );
+
+            } else if ( status == "error" ){   //错误
+
+
+            } else if ( status == "complete" ){ //完成
+
+                RMenuItem[0]->setEnabled( false );
+                RMenuItem[1]->setEnabled( false );
+
+            } else if ( status == "removed" ){  //移除
+
+                RMenuItem[0]->setEnabled( false );
+                RMenuItem[1]->setEnabled( false );
 
             }
 

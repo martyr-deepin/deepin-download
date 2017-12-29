@@ -147,6 +147,7 @@ private:
     void Remove();
     void OpenDownFile();
     void DeleteDownFileDB();
+    void DeleteAllRecord();
     void AddBtFile();
     void AddMetalinkFile();
     void CopyUrlToBoard();
@@ -154,6 +155,7 @@ private:
     void ShowTrayMenu();
     void RemoveAria2Cache();
 
+    void RightTMenu( int itemID );
     //////////////////////////////////////////////////////////////////
 
     void UpdateMWM( QString text );
@@ -190,7 +192,8 @@ public:
     void UpdateGUI_CommandMsg( QJsonObject nObj );
 
 signals:
-     void start();
+     //void start();
+     void HandSort( int col );
 
 /**  定时轮循 信号触发*/
 private slots:

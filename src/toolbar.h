@@ -23,6 +23,14 @@ public:
     void SetToolButton();
     void SetToolSearch();
 
+    QAction *tBtn1;
+    QAction *tBtn4;
+    QAction *tBtn5;
+    QAction *tBtn6;
+    QAction *tBtn7;
+
+
+
 signals:
    void SelToolItem( int btn );
    void SearchChang( QString text );

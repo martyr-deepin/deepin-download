@@ -33,11 +33,11 @@ class DownListView : public QTableView
 
 private:
     MainWindow *mainUI;
-    QHeaderView *tableHead;
+
 
 public:    
     explicit DownListView(  MainWindow *mainUI,QWidget *parent = Q_NULLPTR);
-
+    QHeaderView *tableHead;
     QMenu *m_ContextMenu;
 
     void SetItemData( int row ,TBItem tbitem  );

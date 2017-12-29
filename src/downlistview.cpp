@@ -148,6 +148,7 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
    tableHead->setSortIndicator(1,Qt::AscendingOrder);
    //tableHead->setSortIndicatorShown(true);
    connect( tableHead, SIGNAL(sectionClicked(int)), this, SLOT(view_sort(int)));
+
 }
 
 void DownListView::SetTableWidth( int MainWidth ){
@@ -250,7 +251,9 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
     m_dataModel->item( row , 1 )->setTextAlignment(Qt::AlignCenter);
     m_dataModel->item( row , 2 )->setTextAlignment(Qt::AlignCenter);
     m_dataModel->item( row , 3 )->setTextAlignment(Qt::AlignCenter);
+    m_dataModel->item( row , 4 )->setTextAlignment(Qt::AlignCenter);
 
+    this->setColumnHidden( 5,true );
 
 }
 
@@ -402,7 +405,7 @@ void DownListView::ShowContextMenu( const QPoint &point ){
                 RMenuItem[1]->setDisabled(true);
                 RMenuItem[2]->setDisabled(true);
                 break;
-            case 5:  //回收站
+            case 5:  //
                 break;
             case 6:
                 break;
