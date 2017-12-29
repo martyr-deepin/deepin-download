@@ -37,7 +37,7 @@
 #include "sqlitefunt.h"
 #include "interfaceadaptor.h"
 #include "gcmessagebox.h"
-
+#include "confirmmsgbox.h"
 /** */
 #include "dthememanager.h"
 #include "utils.h"
@@ -61,8 +61,6 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::initMainWindow(){
-
-
 
     /**
      *  初始化 aria2c 接口
@@ -133,7 +131,6 @@ void MainWindow::initMainWindow(){
 
     //mwm  = new MWM( this );
     //mwm->ShowMWM();
-
 
     /** 启用文件拖入支持 */
     this->setAcceptDrops( true );
@@ -219,14 +216,12 @@ void MainWindow::setupMenu()
         //titlebar->menu()->addAction("关于");
         //titlebar->menu()->addAction("退出");
 
-
     }
 }
 
 
 
 void MainWindow::CloseAllWindow(){
-
 
     qDebug() << "CloseAllWindow()";
     newDownDlg->close();
@@ -763,8 +758,29 @@ void MainWindow::DeleteAllRecord(){
 
     //DeleteDownFileDB();
     //RemoveAria2Cache();
-
     QList<DDRecord> t = this->downDB->ReadRecycleList();
+    QString outText = "";
+    if( t.size() == 1  ){
+
+        outText = tr("Are you sure to empty %1 item?").arg( t.size() );
+    } else if ( t.size() > 1 ){
+
+        outText = tr("Are you sure to empty %1 items?").arg( t.size() );;
+    }else{
+        //回收站是空的
+        return;
+    }
+
+    ConfirmMsgBox confirmMsgBox( this, outText ,tr("This action cannot be restored") );
+    confirmMsgBox.setWindowFlags(  Qt::WindowStaysOnTopHint );
+
+    if( confirmMsgBox.exec() != 1 ){
+
+        //取消
+        return;
+    }
+
+    //QList<DDRecord> t = this->downDB->ReadRecycleList();
     GCMessageBox *errorbox;
     int errorCount = 0;
     for( int i = 0 ; i < t.size() ; i++ ){
@@ -790,11 +806,18 @@ void MainWindow::DeleteAllRecord(){
 
                 errorCount++;
             }
+
+        }else{
+
+            //同时删除记录
+            downDB->DeleteDTask( t.at(i).gid );
         }
+
+
     }
 
     RecycleList();
-    downListView->ClearAllItem();
+
 }
 
 /**

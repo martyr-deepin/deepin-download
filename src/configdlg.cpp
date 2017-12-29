@@ -3,4 +3,5 @@
 ConfigDlg::ConfigDlg(QWidget *parent) : QDialog(parent)
 {
 
+
 }

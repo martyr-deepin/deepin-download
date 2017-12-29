@@ -64,7 +64,8 @@ SOURCES += \
     slideitem.cpp \
     slidebar.cpp \
     toolbar.cpp \
-    gcmessagebox.cpp
+    gcmessagebox.cpp \
+    confirmmsgbox.cpp
 
 
 HEADERS += \
@@ -92,7 +93,8 @@ HEADERS += \
     slideitem.h \
     slidebar.h \
     toolbar.h \
-    gcmessagebox.h
+    gcmessagebox.h \
+    confirmmsgbox.h
 
 ##########################################################################################################
 
