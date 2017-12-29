@@ -10,6 +10,6 @@ Homepage: http://www.deepin.org
 
 Package: deepin-download
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, aria2
 Description: deepin download utils
  A download utils for deepin.
