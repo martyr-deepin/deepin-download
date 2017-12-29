@@ -42,6 +42,9 @@
 #include "dthememanager.h"
 #include "utils.h"
 
+#include "DStandardPaths"
+
+
 #define  SLEEPSS          2000
 
 MainWindow::MainWindow(DMainWindow *parent) :DMainWindow( parent){
@@ -62,6 +65,10 @@ MainWindow::~MainWindow(){
 
 void MainWindow::initMainWindow(){
 
+
+    /** 取系统分配的软件缓存目录 */
+    CacheDir = Dtk::Core::DStandardPaths::standardLocations( QStandardPaths::CacheLocation ).at(0);
+
     /**
      *  初始化 aria2c 接口
      */
@@ -73,8 +80,8 @@ void MainWindow::initMainWindow(){
      * 初始化 sqlite 数据库
      */
     qDebug() << "QSqlDatabase::drivers " <<QSqlDatabase::drivers();
-    QString HomeDir = QDir::homePath();
-    QString dbPath = HomeDir + "/deepin_download.db";
+    //QString HomeDir = QDir::homePath();
+    QString dbPath = CacheDir + "/deepin-download.db";
     this->downDB  = new SQLiteFunt( dbPath );
 
     /**
@@ -1723,7 +1730,7 @@ int MainWindow::initAria2cWork(){
 
         QString HomeDir = QDir::homePath();
         QString Downloads = HomeDir + "/Downloads";
-        QString SessionFile = HomeDir + "/deepin_aria2c.session";
+        QString SessionFile = CacheDir + "/deepin_aria2c.session";
         QString SaveTime = "60";
         QString RPCPort = "19799";
 

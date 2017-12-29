@@ -19,6 +19,8 @@
 
 #include <iostream>
 #include "utils.h"
+#include "DLog"
+
 
 //#include <jcon/json_rpc_client.h>
 DWIDGET_USE_NAMESPACE
@@ -29,6 +31,7 @@ int main(int argc, char *argv[])
 {
 
     QString fileURL = "";
+
 
     /**
      * 命令行参数
@@ -65,6 +68,11 @@ int main(int argc, char *argv[])
     app.setApplicationVersion("1.0");
     //app.loadTranslator();
 
+    /**
+     * 日志
+     */
+    Dtk::Core::DLogManager::registerFileAppender();
+    Dtk::Core::DLogManager::registerConsoleAppender();
 
     /**
     * 单例测试

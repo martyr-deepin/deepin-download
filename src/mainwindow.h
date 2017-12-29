@@ -79,6 +79,7 @@ public:
 
 protected:
 
+    QString CacheDir;
     //GCThread  *wThread;
     void initMainWindow();
     void setupMenu();
