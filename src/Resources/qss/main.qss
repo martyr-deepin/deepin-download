@@ -15,16 +15,28 @@ QListWidget::item:hover {
 }
 
 QListWidget::item:selected {
-    border: 0px;	
+
+    border: 0px;
     background: #d5edfe;
+
 }
 
-QHeaderView::section {
+QTableView::item:selected {
+/**
+    border: 0px;
+    background: #d5edfe;
+**/
+}
+
+QTableView QHeaderView::section {
     /*color: white;*/
     background-color: rgb(255,255,255);
     border: 0px solid #FFFFFF;
     border-radius:0px;
     border-color: rgb(64, 64, 64);
+
+    font-style:normal;
+    font-weight:normal;}
 }
 
 
@@ -96,8 +108,8 @@ QToolButton:checked, QToolButton:pressed {
 /*  ////////////////////////////////////////////////////////////////////   */
 
 QProgressBar{
-    border:2px solid grey;
-    border-radius: 5px;
+    border:1px solid grey;
+    border-radius: 1px;
     background-color: #00000;
 }
 
@@ -107,8 +119,8 @@ QProgressBar::chunk{
 }
 
 QProgressBar{
-    border:2px solid grey;
-    border-radius: 5px;
+    border:1px solid grey;
+    border-radius: 1px;
     text-align: center;
 }
 

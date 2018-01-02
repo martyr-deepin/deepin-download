@@ -1264,6 +1264,10 @@ void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
     int zcount = 0;
     for( int i = 0 ; i < tbList.size() ; i++  ){
 
+
+        if( tbList.at(i).savepath == "" ){
+             continue;
+        }
         downListView->InsertItem( i,tbList.at(i) );
         //mwm->UpdateMWM(  tbList.at(i).Progress );
         downDB->SetDownSavePath( tbList.at(i).gid ,tbList.at(i).savepath );
@@ -1632,7 +1636,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                 case 3:   //已完成
                     RMenuItem[0]->setDisabled(true);
                     RMenuItem[1]->setDisabled(true);
-                    RMenuItem[2]->setDisabled(true);
+                    RMenuItem[2]->setDisabled(false);
 
                     break;
                 /**
@@ -1787,7 +1791,7 @@ int MainWindow::initAria2cWork(){
 
         QString HomeDir = QDir::homePath();
         QString Downloads = HomeDir + "/Downloads";
-        QString SessionFile = CacheDir + "/deepin_aria2c.session";
+        QString SessionFile = CacheDir + "/deepin-aria2c.session";
         QString SaveTime = "60";
         QString RPCPort = "19799";
 

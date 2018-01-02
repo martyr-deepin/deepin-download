@@ -64,7 +64,7 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
     //this->setSelectionMode(QAbstractItemView::SingleSelection);
 
     //表头信息显示居左
-    //this->horizontalHeader()->setDefaultAlignment( Qt::AlignLeft );
+    this->horizontalHeader()->setDefaultAlignment( Qt::AlignLeft );
 
     //隐藏垂直表头
     this->verticalHeader()->setVisible( false );
@@ -190,17 +190,35 @@ void DownListView::UpdateItem( TBItem tbitem  ){
 
 void DownListView::AppendItem( TBItem tbitem  ){
 
-    int nRow = m_dataModel->rowCount();
-    m_dataModel->insertRow( nRow );
-    SetItemData( nRow ,tbitem );
+    if(  tbitem.savepath != "" ){
+        //忽略错误项
+        if( tbitem.State != "error" ){
+
+            //m_dataModel->insertRow( row );
+            //SetItemData( row ,tbitem );
+            int nRow = m_dataModel->rowCount();
+            m_dataModel->insertRow( nRow );
+            SetItemData( nRow ,tbitem );
+        }
+    }
 }
 
 
 
 void DownListView::InsertItem( int row ,TBItem tbitem  ){
 
-    m_dataModel->insertRow( row );
-    SetItemData( row ,tbitem );
+    if(  tbitem.savepath != "" ){
+
+        if( tbitem.State != "error" ){
+            m_dataModel->insertRow( row );
+            SetItemData( row ,tbitem );
+        }
+
+    }else{
+
+        qDebug() << tbitem.savepath;
+    }
+
 }
 
 void DownListView::SetItemData( int row ,TBItem tbitem  ){
@@ -218,6 +236,19 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
         filename = tbitem.uri;
     }
 
+
+    if( filename.indexOf( "%" ) != -1 ){
+
+        //转码 url 编码 ==> 中文
+        QByteArray urlEncoding = QByteArray::fromPercentEncoding( filename.toUtf8() );
+        QString urlCNstr =  QString( urlEncoding );
+
+        qDebug() << "urlCNstr " << urlCNstr;
+        filename = urlCNstr;
+
+    }
+
+
     QString Speed = "";
     if( tbitem.Speed.toInt(NULL,10) > 0 ){
        Speed =  QString::number( tbitem.Speed.toInt(NULL,10) / 1024 ) + " KB/S";
@@ -233,7 +264,9 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
     }
 
 
-    SetItemData( row, 0,  filename );
+    qDebug() << "filename: " << filename;
+
+    SetItemData( row, 0,  filename + " XXX");
     if( tbitem.Progress == "0" ){
 
         SetItemData( row, 1,  "");
@@ -249,9 +282,9 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
     SetItemData( row, 5,  tbitem.gid );
 
     m_dataModel->item( row , 1 )->setTextAlignment(Qt::AlignCenter);
-    m_dataModel->item( row , 2 )->setTextAlignment(Qt::AlignCenter);
-    m_dataModel->item( row , 3 )->setTextAlignment(Qt::AlignCenter);
-    m_dataModel->item( row , 4 )->setTextAlignment(Qt::AlignCenter);
+    //m_dataModel->item( row , 2 )->setTextAlignment(Qt::AlignCenter);
+    //m_dataModel->item( row , 3 )->setTextAlignment(Qt::AlignCenter);
+    //m_dataModel->item( row , 4 )->setTextAlignment(Qt::AlignCenter);
 
     this->setColumnHidden( 5,true );
 
