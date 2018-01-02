@@ -47,5 +47,6 @@
         <file>Resources/images/nav_trash_active.svg</file>
         <file>Resources/images/nav_trash_normal.svg</file>
         <file>Resources/qss/main.qss</file>
+        <file>Resources/images/task_pause_active.svg</file>
     </qresource>
 </RCC>

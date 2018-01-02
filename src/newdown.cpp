@@ -144,6 +144,14 @@ int NewDown::Button2Click(){
                   }
               }
 
+              //ed2k://
+              if ( url.left( 4 ) == "ed2k" ){
+
+                //【您输入的地址不能被正确解析，请重试！】【The address cannot be analyzed, please retry!】
+                this->msg->setText( tr("The address cannot be analyzed, please retry!") );
+                return -1;
+              }
+
               if ( url.trimmed() != "" ){
 
                   mainUI->AppendDownUrl(  url );

@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include <DTitlebar>
 #include <QLabel>
 #include <QDebug>
@@ -34,10 +34,13 @@
 #include <QDBusInterface>
 #include <QDBusMessage>
 
+#include <QSettings>
+
 #include "sqlitefunt.h"
 #include "interfaceadaptor.h"
 #include "gcmessagebox.h"
 #include "confirmmsgbox.h"
+#include "closewindowmsgbox.h"
 /** */
 #include "dthememanager.h"
 #include "utils.h"
@@ -242,21 +245,72 @@ void MainWindow::CloseAllWindow(){
 void MainWindow::closeEvent(QCloseEvent *event){
 
     qDebug() << "MainWindow::close()";
-    //QMainWindow::close();
-    if( this->closeApp ){
 
-        CloseAllWindow();
-        event->accept();
+    QSettings *configIniRead = new QSettings( CacheDir + "/setup.ini", QSettings::IniFormat);
+    configIniRead->setIniCodec("UTF8");
+    int ExitModel = configIniRead->value("/Config/ExitModel",0).toInt();
+    int ShowMM = configIniRead->value("/Config/ShowMM",1).toInt();
 
-    }else{
+    delete configIniRead;
 
-        /** 主窗口上关闭时 自动最小化 */
-        showMinimized(); //最小化
-        //隐藏窗口之后，关闭子窗口会导致程序退出？？ 原因暂不明
-        //this->hide(); /** 暂时不使用关闭时自动隐藏 */
-        //systemTrayIcon->ShowTrayMessage( "你去忙吧","我在这儿呢默默干活，有事我叫你..."  );
-        event->ignore();
+    if ( ShowMM != 1 ){ //无提示
+
+        if ( ExitModel == 0 ){
+          //直接退出
+            CloseAllWindow();
+            event->accept();
+
+        }else{
+          //最小化
+            showMinimized(); //最小化
+            event->ignore();
+        }
+
+        return;
     }
+
+    //有提示....
+    CloseWindowMsgBox *closewindowBox = new CloseWindowMsgBox;
+    int index = closewindowBox->exec();
+    if( index == 1 ){
+
+        QSettings *configIniWrite = new QSettings(CacheDir + "/setup.ini", QSettings::IniFormat);
+        configIniWrite->setIniCodec("UTF8");
+
+        qDebug() << "CloseWindowMsgBox::buttonClicked" << index;
+
+        qDebug() << "sel1->isChecked()" << closewindowBox->sel1->isChecked();
+        qDebug() << "sel2->isChecked()" << closewindowBox->sel2->isChecked();
+        qDebug() << "checkBox->isChecked()" << closewindowBox->checkBox->isChecked();
+
+        if (  closewindowBox->sel1->isChecked() ){
+            //退出
+            CloseAllWindow();
+            event->accept();
+            configIniWrite->setValue("/Config/ExitModel", 0 );
+        }else{
+            //最小化到托盘
+            showMinimized(); //最小化
+            event->ignore();
+            configIniWrite->setValue("/Config/ExitModel", 1 );
+        }
+
+        if( closewindowBox->checkBox->isChecked() ){
+            //不再提醒
+            configIniWrite->setValue("/Config/ShowMM", 0 );
+        }else{
+
+            configIniWrite->setValue("/Config/ShowMM", 1 );
+        }
+
+        delete configIniWrite;
+
+        return;
+    }else{
+        event->ignore();
+        return;
+    }
+
 }
 
 void MainWindow::SelToolItem( int btn ){
@@ -1050,7 +1104,8 @@ void MainWindow::AppendDownUrl( QString urlStr  ){
 
    QString ID = downDB->AppendDTask(  urlStr );  //添加数据库记录
    aria2c->SendMsgAria2c_addUri( urlStr ,ID  );
-   ShowMessageTip( "Join a new task：" + urlStr  );
+   //2018-1-2 新建任务开始下载不需要系统通知
+   //ShowMessageTip( "Join a new task：" + urlStr  );
    slidebar->SetSelectRow( 1 );
 
 }
@@ -1059,16 +1114,18 @@ void MainWindow::AppendDownBT( QString btfilepath   ){
 
     QString ID = downDB->AppendDTask(  btfilepath ,"2" ); //添加数据库记录
     aria2c->SendMsgAria2c_addTorrent( btfilepath ,ID  );
-    ShowMessageTip( "Enable：" + btfilepath  );
-    //slideBar->SetSelectRow( 1 );
+    //新建任务开始下载不需要系统通知
+    //2018-1-2 ShowMessageTip( "Enable：" + btfilepath  );
+    slidebar->SetSelectRow( 1 );
 }
 
 void MainWindow::AppendDownMetalink( QString Metalinkfilepath   ){
 
     QString ID = downDB->AppendDTask(  Metalinkfilepath ,"3" ); //添加数据库记录
     aria2c->SendMsgAria2c_addMetalink( Metalinkfilepath ,ID );
-    ShowMessageTip( "Enable： " + Metalinkfilepath  );
-    //slideBar->SetSelectRow( 1 );
+    //2018-1-2 新建任务开始下载不需要系统通知
+    //ShowMessageTip( "Enable： " + Metalinkfilepath  );
+    slidebar->SetSelectRow( 1 );
 }
 
 

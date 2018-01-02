@@ -62,6 +62,8 @@ void SQLiteFunt::initDBTable(){
 
         qDebug() << "Error SQLiteFunt::initDBTable()";
     }
+
+
     sql_query.finish();
 
 }
