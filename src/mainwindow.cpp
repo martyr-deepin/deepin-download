@@ -532,7 +532,6 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
     downListView =  new DownListView( this,centerWidget );
 
     //m_ContextMenu = new QMenu;
-
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget( downListView );
     //layout->setContentsMargins(0,0,0,0);
@@ -542,7 +541,13 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
     connect( downListView, &QTableView::clicked,this, [=](QModelIndex modelIndex ){
 
           qDebug() << "downListView.click: " << modelIndex;
-
+/**
+          QFont hfont;
+          hfont.setBold(false);
+          hfont.setStyleName("Normal");
+          hfont.setWeight(1);
+          downListView->horizontalHeader()->setFont( hfont );
+**/
           QString status =  modelIndex.sibling( modelIndex.row(),4 ).data().toString();
           qDebug() << "Select Status : " << status;
 
@@ -587,8 +592,6 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
               toolbar->tBtn5->setEnabled( false );
               toolbar->tBtn6->setEnabled( true );
           }
-
-
 
     });
 
@@ -935,14 +938,16 @@ void MainWindow::Remove(){
         QString gid = index.sibling( index.row() ,5 ).data().toString();
         //QString status = index.sibling( index.row() ,4).data().toString();
         if ( gid != ""  ){
+
             aria2c->SendMsgAria2c_pause( gid );
             aria2c->SendMsgAria2c_remove( gid );
-
             DDRecord d;
             d.gid  = gid;
             d.type =  3;   //3 移除
             qDebug() << "Remove :" << gid;
             downDB->SetDTaskStatus( d );
+
+
         }
 
     }
@@ -1216,7 +1221,6 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
 
         if( ! findN ){
 
-
             downListView->InsertItem( downListView->m_dataModel->rowCount() ,tbitem );
         }
 
@@ -1235,8 +1239,8 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
     /** 在数据库表中记录 已完成的任务 */
     if ( tbitem.State == "complete" ){
         int dbt_Type = downDB->GetDTaskInfo( tbitem.gid ).type;
-
-        if ( dbt_Type != 4 ){
+        /** 3人为标记为删除*/
+        if ( dbt_Type != 4 && dbt_Type != 3 ){
 
            DDRecord t;
            t.gid = tbitem.gid;
@@ -1265,10 +1269,25 @@ void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
     for( int i = 0 ; i < tbList.size() ; i++  ){
 
 
+        /** 过滤掉不能下载的 */
         if( tbList.at(i).savepath == "" ){
              continue;
         }
-        downListView->InsertItem( i,tbList.at(i) );
+
+        /** 过滤掉出错和已移除的 */
+        if(  tbList.at(i).State == "error" || tbList.at(i).State == "removed"   ){
+             continue;
+        }
+
+        /** 过滤掉已经被标记删除的 */
+        int Dtype = downDB->GetDTaskInfo( tbList.at(i).gid ).type;
+        if( Dtype == 3 ){
+             continue;
+        }
+
+
+        downListView->InsertItem( downListView->m_dataModel->rowCount(),tbList.at(i) );
+
         //mwm->UpdateMWM(  tbList.at(i).Progress );
         downDB->SetDownSavePath( tbList.at(i).gid ,tbList.at(i).savepath );
 
@@ -1540,7 +1559,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         RMenuItem[2] = new QAction( tr("Delete") ,this);      //删除 Remove
         RMenuItem[2]->setData( "3");
 
-        RMenuItem[3] = new QAction( "property" ,this);    //属性
+        RMenuItem[3] = new QAction( "property" ,this);        //属性
         RMenuItem[3]->setData( "4");
 
         downListView->m_ContextMenu->addSeparator();

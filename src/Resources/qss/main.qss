@@ -30,13 +30,15 @@ QTableView::item:selected {
 
 QTableView QHeaderView::section {
     /*color: white;*/
+
     background-color: rgb(255,255,255);
     border: 0px solid #FFFFFF;
     border-radius:0px;
     border-color: rgb(64, 64, 64);
 
     font-style:normal;
-    font-weight:normal;}
+    font-weight:normal;
+
 }
 
 

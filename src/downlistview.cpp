@@ -123,6 +123,11 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
 
    /** 列宽自适应大小 */
    //this->horizontalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
+//   QFont hfont;
+//   hfont.setBold(false);
+//   hfont.setStyleName("Normal");
+//   hfont.setWeight(1);
+//   this->horizontalHeader()->setFont( hfont );
 
    /** 初始列宽定义 */
    this->setColumnWidth( 0 ,300 );
@@ -190,7 +195,7 @@ void DownListView::UpdateItem( TBItem tbitem  ){
 
 void DownListView::AppendItem( TBItem tbitem  ){
 
-    if(  tbitem.savepath != "" ){
+    //if(  tbitem.savepath != "" ){
         //忽略错误项
         if( tbitem.State != "error" ){
 
@@ -200,19 +205,19 @@ void DownListView::AppendItem( TBItem tbitem  ){
             m_dataModel->insertRow( nRow );
             SetItemData( nRow ,tbitem );
         }
-    }
+    //}
 }
 
 
 
 void DownListView::InsertItem( int row ,TBItem tbitem  ){
 
-    if(  tbitem.savepath != "" ){
+    if(  tbitem.uri != ""  ){
 
-        if( tbitem.State != "error" ){
+
             m_dataModel->insertRow( row );
             SetItemData( row ,tbitem );
-        }
+
 
     }else{
 
