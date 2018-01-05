@@ -14,6 +14,7 @@ struct TBItem {
     QString RestTime;   // 剩余时间
     QString State;      // 状态
     QString gid;        // gid
+    QString dtime;      // dtime
     QString savepath;   // 保存路径
 };
 
@@ -27,6 +28,7 @@ struct DDRecord {
     QString gid;
     int type;
     int classn;
+    QString dtime;      // dtime
     QString savepath;
 
 };

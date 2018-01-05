@@ -54,20 +54,34 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) :Dtk::Widget::DDialog(par
     QString HomeDir = QDir::homePath();
     QString Downloads = HomeDir + "/Downloads";
     QString Desktop = HomeDir + "/Desktop";
+    selSavePath->addItem( "...","..." );
     selSavePath->addItem( QIcon( ":Resources/images/folder-downloads.svg" ), "Downloads",Downloads  );
     selSavePath->addItem( QIcon( ":Resources/images/folder-desktop.svg" ),"Desktop",Desktop );
-    selSavePath->addItem( "...","..." );
+
     SS->addRow( text ,selSavePath );
 
-    selSavePath->setCurrentIndex( 0 );
+    selSavePath->setCurrentIndex( 1 );
 
-    vbLayout->addWidget( Edit1 );
-    //vbLayout->addWidget( button );
+
+    errormsg = new QLabel;
+    errormsg->setText("");
+    errormsg->setAlignment( Qt::AlignHCenter );
+    //QFont ft;
+    //ft.setPointSize(12);
+    //errormsg->setFont(ft);
+    QPalette pa;
+    pa.setColor(QPalette::WindowText,Qt::red);
+    errormsg->setPalette(pa);
+
+    vbLayout->addWidget( Edit1 );    
     vbLayout->addWidget( openFileDlg );
+    vbLayout->addWidget( errormsg );
     vbLayout->addWidget( SaveSetup );
 
     msg = new QLabel;
     msg->setText("");
+    msg->setVisible( false );
+
 
     addContent( form );
     addContent( msg );
@@ -112,7 +126,9 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) :Dtk::Widget::DDialog(par
                 SelectSaveDir();
 
             }else{
-                msg->setText( "保存路径：" + SelPathStr );
+
+                checkDir( SelPathStr );
+                //msg->setText( "保存路径：" + SelPathStr );
             }
 
      });
@@ -132,34 +148,44 @@ void NewDown::SelectSaveDir(){
                                                      "/home",
                                                      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
 
-   //msg->setText( dir );
 
-   QFile file( dir + "/testcreate.gc" );
-   if ( file.open( QIODevice::ReadWrite | QIODevice::Text ) ){
-
-       qDebug() << "OK";
-
-       //selSavePath->setCurrentText( dir );
-       msg->setText( "保存路径：" + dir );
-
-       this->SavePath = dir;
-
-   }else{
-       qDebug() << "Error....";
-       /**
-        * 创建打开测试文件失败，选择的这个路径有可能不能写无权限等
-        **/
-       msg->setText( "该路径不能用于保存下载文件" );
-
-       this->SavePath = "";
-   }
-   file.close();
-   QFile::remove( dir + "/testcreate.gc" );
-
-
-   //selSavePath->setCurrentIndex( -1 );
+    checkDir( dir  );
 
 }
+
+bool NewDown::checkDir( QString path ){
+
+    QFile file( path + "/testcreate.gc" );
+    if ( file.open( QIODevice::ReadWrite | QIODevice::Text ) ){
+
+        qDebug() << "OK";
+
+        //selSavePath->setCurrentText( dir );
+        errormsg->setText( "" );
+        msg->setText( "保存路径：" + path );
+
+        this->SavePath = path;
+
+        if( selSavePath->findText(   path ) == -1 ){
+
+            selSavePath->addItem( QIcon( ":Resources/images/folder-desktop.svg" ),path,path  );
+            selSavePath->setCurrentIndex( selSavePath->count() -1 );
+        }
+
+
+    }else{
+        qDebug() << "Error....";
+        /**
+         * 创建打开测试文件失败，选择的这个路径有可能不能写无权限等
+         **/
+        errormsg->setText( tr("Sorry, you don't have permission to operate file/folder") );
+
+        this->SavePath = "";
+    }
+    file.close();
+    QFile::remove( path + "/testcreate.gc" );
+}
+
 
 void NewDown::buttonClicked(int index, const QString &text){
 
@@ -188,7 +214,7 @@ void NewDown::Button1Click(){
 
     this->Edit1->setText("");
     this->msg->setText( "" );
-
+    this->errormsg->setText( "" );
     this->close();
 
 }
@@ -196,6 +222,12 @@ void NewDown::Button1Click(){
 int NewDown::Button2Click(){
 
    QString urlStrs =  Edit1->toPlainText();
+
+   if ( this->SavePath == "" ){
+
+       errormsg->setText( "未设置正确的保存路径" );
+       return -1;
+   }
 
    if ( urlStrs.trimmed().length() != 0  ){
 
@@ -207,12 +239,12 @@ int NewDown::Button2Click(){
 
                case 1:
 
-                   mainUI->AppendDownMetalink( this->dPath );
+                   mainUI->AppendDownMetalink( this->dPath ,this->SavePath );
                    break;
 
                case 2:
 
-                   mainUI->AppendDownBT( this->dPath );
+                   mainUI->AppendDownBT( this->dPath ,this->SavePath );
                    break;
 
                //default:
@@ -234,7 +266,7 @@ int NewDown::Button2Click(){
                   //QMessageBox::information( NULL, "",   url );
                   if( url == "" ){
                       //【您输入的地址不能被正确解析，请重试！】【The address cannot be analyzed, please retry!】
-                      this->msg->setText( tr("The address cannot be analyzed, please retry!") );
+                      this->errormsg->setText( tr("The address cannot be analyzed, please retry!") );
                       return -1;
                   }
               }
@@ -243,7 +275,7 @@ int NewDown::Button2Click(){
               if ( url.left( 4 ) == "ed2k" ){
 
                 //【您输入的地址不能被正确解析，请重试！】【The address cannot be analyzed, please retry!】
-                this->msg->setText( tr("The address cannot be analyzed, please retry!") );
+                this->errormsg->setText( tr("The address cannot be analyzed, please retry!") );
                 return -1;
               }
 
@@ -261,7 +293,7 @@ int NewDown::Button2Click(){
 
    }else{
 
-       msg->setText( "Download address download address can not be empty..." );
+       errormsg->setText( "Download address download address can not be empty..." );
 
        return -2;
    }

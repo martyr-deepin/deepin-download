@@ -16,7 +16,7 @@ DownListView::DownListView( MainWindow *mainUI, QWidget *parent): QTableView( pa
 
     QStringList tbHeader;
     //tbHeader << "文件名" << "大小和进度" << "速度" << "剩余" << "状态" << "gid";
-    tbHeader << tr("File name") << tr("Size") << tr("Speed") << tr("Remaining time") << tr("Status") << "gid" << "status" ;
+    tbHeader << tr("File name") << tr("Size") << tr("Speed") << tr("Remaining time") << tr("Status") << "gid" << "status" << "";
 
     QList<TBItem> tbList;
 
@@ -364,6 +364,7 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
 
     SetItemData( row, 5,  tbitem.gid );
     SetItemData( row, 6,  tbitem.State );
+
 
     m_dataModel->item( row , 1 )->setTextAlignment(Qt::AlignCenter);
     //m_dataModel->item( row , 2 )->setTextAlignment(Qt::AlignCenter);

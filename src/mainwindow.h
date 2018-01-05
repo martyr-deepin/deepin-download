@@ -189,9 +189,9 @@ public:
     void SetBottomStatusText( QString text );
     void ShowMessageTip( QString text );
 
-    void AppendDownBT( QString btfilepath ,QString SavePath = ""  );
-    void AppendDownUrl( QString urlStr ,QString SavePath = "" );
-    void AppendDownMetalink( QString Metalinkfilepath ,QString SavePath = "");
+    void AppendDownBT( QString btfilepath ,QString SavePath = "*"  );
+    void AppendDownUrl( QString urlStr ,QString SavePath = "*" );
+    void AppendDownMetalink( QString Metalinkfilepath ,QString SavePath = "*");
 
     void OpenLinkFile( QString filenmae );
     QMenu* ShareRMenu();

@@ -56,6 +56,7 @@ void SQLiteFunt::initDBTable(){
                                                   "gid      varchar(18),"     // aria2 分配的gid
                                                   "type     int,"             // 状态  0 / 4
                                                   "classn   int,"             // 任务类型：下载url | BT | 磁力链
+                                                  "dtime    timestamp not null default (datetime('now','localtime')),"        // 下载时间
                                                   "savepath varchar(512))";   // 保存路径
 
     if ( ! sql_query.exec( create_sql ) ){
@@ -119,7 +120,8 @@ DDRecord SQLiteFunt::GetDTaskInfo( QString gid ){
        t.gid = query.value(2).toString();
        t.type = query.value(3).toInt();
        t.classn = query.value(4).toInt();
-       t.savepath = query.value(5).toString();
+       t.dtime = query.value(5).toString();
+       t.savepath = query.value(6).toString();
 
        //qDebug()<< "read " << t.id + " "+ t.url << " "+ t.gid+ " "+ t.type + " " + t.classn;
     }
@@ -150,7 +152,8 @@ QList<DDRecord> SQLiteFunt::ReadDDTask( int type ){
        t.gid = query.value(2).toString();
        t.type = query.value(3).toInt();
        t.classn = query.value(4).toInt();
-       t.savepath = query.value(5).toString();
+       t.dtime = query.value(5).toString();
+       t.savepath = query.value(6).toString();
 
        if( t.type != 1  ){
            t.url  = t.savepath;
@@ -187,7 +190,8 @@ QList<DDRecord> SQLiteFunt::ReadRecycleList(){
        t.gid = query.value(2).toString();
        t.type = query.value(3).toInt();
        t.classn = query.value(4).toInt();
-       t.savepath = query.value(5).toString();
+       t.dtime = query.value(5).toString();
+       t.savepath = query.value(6).toString();
 
        if( t.type != 1   ){
            t.url  = t.savepath;
@@ -218,7 +222,7 @@ QList<DDRecord> SQLiteFunt::ReadALLTask(){
 
     while( query.next() ){
 
-       if( query.value(2).toString() == "0" || query.value(5).toString() == "" ){
+       if( query.value(2).toString() == "0" || query.value(6).toString() == "" ){
 
            qDebug() << "错误记录 " + query.value(0).toInt();
            continue;
@@ -232,7 +236,8 @@ QList<DDRecord> SQLiteFunt::ReadALLTask(){
        t.gid = query.value(2).toString();
        t.type = query.value(3).toInt();
        t.classn = query.value(4).toInt();
-       t.savepath = query.value(5).toString();
+       t.dtime = query.value(5).toString();
+       t.savepath = query.value(6).toString();
 
        if( t.type != 1   ){
            t.url  = t.savepath;
@@ -287,7 +292,7 @@ QString SQLiteFunt::AppendDTask( QString url ,QString classn ){
 
     QSqlQuery query( m_dbconn );
 
-    QString sql ="insert into downlist ( url ,gid,type,classn) values( '"+ url +"','0',0,"+ classn +" )";
+    QString sql ="insert into downlist ( url ,gid,type,classn) values( '"+ url +"','0',0,"+ classn +")";
 
     qDebug() << sql;
 

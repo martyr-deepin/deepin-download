@@ -22,10 +22,11 @@ public:
     void SetDownloadEdit( QString urlStr );
     void ClearEdit();
 private:
-
+    bool checkDir( QString path );
     void SelectSaveDir();
     MainWindow  *mainUI;
-    QTextEdit   *Edit1;    
+    QTextEdit   *Edit1;
+    QLabel      *errormsg;
     QLabel      *msg;
     QComboBox   *selSavePath;
     QString     GetThunderUrl(  QString thunder_url );

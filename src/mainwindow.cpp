@@ -525,6 +525,9 @@ void MainWindow::LoadTrayIcon(){
            case QSystemTrayIcon::DoubleClick:
                ShowWindow();
                break;
+           case QSystemTrayIcon::Trigger:
+               ShowWindow();
+               break;
            //case QSystemTrayIcon::Trigger:
            //    break;
        }
@@ -931,10 +934,13 @@ void MainWindow::DeleteAllRecord(){
         }else{
 
             //同时删除记录
-            downDB->DeleteDTask( t.at(i).gid );
+            //downDB->DeleteDTask( t.at(i).gid );
         }
 
-
+            /**
+             *  无论文件是否同步删除成功，都删除记录
+             */
+            downDB->DeleteDTask( t.at(i).gid );
     }
 
     RecycleList();
@@ -1005,6 +1011,12 @@ void MainWindow::Remove(){
 
             if(  GetSlideSelRow() == 0  ){
 
+                downListView->m_dataModel->removeRow( index.row() );
+            }
+
+            if(  GetSlideSelRow() == 4  ){
+
+                downDB->DeleteDTask(  gid );
                 downListView->m_dataModel->removeRow( index.row() );
             }
 
@@ -1172,7 +1184,11 @@ void MainWindow::AppendDownUrl( QString urlStr ,QString SavePath ){
 
    qDebug() << SavePath;
 
-   aria2c->SendMsgAria2c_SetSavePath( SavePath  );
+   if( SavePath != "*"){
+
+       aria2c->SendMsgAria2c_SetSavePath( SavePath  );
+   }
+
 
    QString ID = downDB->AppendDTask(  urlStr );  //添加数据库记录
    aria2c->SendMsgAria2c_addUri( urlStr ,ID  );
@@ -1184,6 +1200,12 @@ void MainWindow::AppendDownUrl( QString urlStr ,QString SavePath ){
 
 void MainWindow::AppendDownBT( QString btfilepath ,QString SavePath  ){
 
+
+    if( SavePath != "*"){
+
+        aria2c->SendMsgAria2c_SetSavePath( SavePath  );
+    }
+
     QString ID = downDB->AppendDTask(  btfilepath ,"2" ); //添加数据库记录
     aria2c->SendMsgAria2c_addTorrent( btfilepath ,ID  );
     //新建任务开始下载不需要系统通知
@@ -1192,6 +1214,11 @@ void MainWindow::AppendDownBT( QString btfilepath ,QString SavePath  ){
 }
 
 void MainWindow::AppendDownMetalink( QString Metalinkfilepath ,QString SavePath  ){
+
+    if( SavePath != "*"){
+
+        aria2c->SendMsgAria2c_SetSavePath( SavePath  );
+    }
 
     QString ID = downDB->AppendDTask(  Metalinkfilepath ,"3" ); //添加数据库记录
     aria2c->SendMsgAria2c_addMetalink( Metalinkfilepath ,ID );
@@ -1329,7 +1356,6 @@ void MainWindow::OnNetworkReplyNode( TBItem* tbitem ){
     waterProgress->setVisible( false );
 
     //qDebug() << "*********** UpdateGUI_StatusMsg : " << tbitem.uri << tbitem.Progress << " ********** " ;
-
     //downDB->SetDownSavePath( tbitem->gid ,tbitem->savepath );
     /** 频繁 SQLite UPDATE 记录疑似引起主线程卡顿 */
     if ( downDB->GetDownSavePath( tbitem->gid ) == ""  ){
@@ -1600,13 +1626,11 @@ void MainWindow::RecycleList(){
     for( int i = 0 ; i < t.size() ; i++ ){
 
         TBItem x;
-
         QString filename = t.at(i).url.right( t.at(i).url.length() - t.at(i).url.lastIndexOf ("/") - 1 );
         x.uri = filename;
         x.gid  = t.at(i).gid;
         x.Progress = "0";
         x.State = tr( "Deleted" ); //已删除
-
         this->downListView->InsertItem( i,x );
     }
 
@@ -1947,7 +1971,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                     if ( selected.count() > 0 ){
                         RMenuItem[0]->setDisabled(true);
                         RMenuItem[1]->setDisabled(true);
-                        RMenuItem[2]->setDisabled(true);
+                        RMenuItem[2]->setDisabled(false);
                         RMenuItem[3]->setDisabled(true);
                         RMenuItem[4]->setDisabled(false);
                         RMenuItem[5]->setDisabled(false);
@@ -1957,6 +1981,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                         RMenuItem[8]->setVisible( true );
                     }else{
 
+                        RMenuItem[2]->setDisabled( true );
                         RMenuItem[8]->setVisible( true );
                         RMenuItem[8]->setEnabled( true );
                     }
@@ -1983,6 +2008,16 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
 
                 RMenuItem[8]->setEnabled( false );
             }
+
+            if( SlideSelRow == 4  && modelIndex.row() < 0 && downListView->m_dataModel->rowCount() >= 1  ){
+
+                RMenuItem[8]->setEnabled( true );
+
+            }else{
+
+                RMenuItem[8]->setEnabled( false );
+            }
+
 
             /**
              * 6 ==> status
@@ -2018,8 +2053,6 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                 RMenuItem[1]->setEnabled( false );
 
             }
-
-
 
         downListView->m_ContextMenu->exec( QCursor::pos() ); // 当前鼠标位置
 }
@@ -2095,7 +2128,7 @@ int MainWindow::initAria2cWork(){
         }
     }else{
         //qDebug() << "ariar2c 不在进程中...";
-        ShowMessageTip(  "ariar2c 不在进程中..." );
+        //ShowMessageTip(  "ariar2c 不在进程中..." );
     }
 
     if ( pid != 0 ){
