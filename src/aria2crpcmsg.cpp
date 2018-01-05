@@ -367,14 +367,16 @@ void Aria2cRPCMsg::SendMsgAria2c_changeOption( changeOption setCOption ,QString 
         QString gid = this->gidList[ id ];
         QJsonArray  item;
         QJsonObject options;
+
         //options.insert( "bt-max-peers", setCOption.bt_max_peers );
         //options.insert( "bt-request-peer-speed-limit", setCOption.bt_request_peer_speed_limit );
         //options.insert( "bt-remove-unselected-file", setCOption.bt_remove_unselected_file );
-        //options.insert( "force-save", setCOption.force_save );
+        //options.insert( "force-save", setCOption.force_save );        
         options.insert( "max-download-limit", setCOption.max_download_limit );
         options.insert( "max-upload-limit", setCOption.max_upload_limit );
         item.append( gid  );
         item.append( options );
+
         SendRPC2Aria2c( "aria2.changeOption" , item ,id );
 
 }
@@ -561,6 +563,26 @@ void Aria2cRPCMsg::SendMsgAria2c_system_listNotifications(){
     SendRPC2Aria2c( "system.listNotifications" ,"0" );
 
 }
+
+/**
+*
+*/
+
+void Aria2cRPCMsg::SendMsgAria2c_SetSavePath( QString SavePath  ){
+
+
+    QJsonArray item;
+    QJsonObject option;
+
+    option.insert( "dir",SavePath );
+
+    item.append( option );
+
+    SendRPC2Aria2c( "aria2.changeGlobalOption" , item ,"0" );
+
+}
+
+/** ========================================================= **/
 
 /**
 *  返回消息分发
@@ -2257,6 +2279,7 @@ void Aria2cRPCMsg::Aria2cRMsg_tellMessage( QJsonObject nObj ){
 
              tbitem.RestTime = totalLength + "|" + completedLength;
 
+
              tbitem.Progress = QString::number( bitfield ,10 );  //进度
              tbitem.Speed = result.value( "downloadSpeed" ).toString(); //下载速度
              tbitem.State = result.value( "status" ).toString();    //状态
@@ -2265,6 +2288,10 @@ void Aria2cRPCMsg::Aria2cRMsg_tellMessage( QJsonObject nObj ){
 
                  continue;
              }
+
+
+
+
 
              tbList.append( tbitem );
 

@@ -16,7 +16,7 @@ DownListView::DownListView( MainWindow *mainUI, QWidget *parent): QTableView( pa
 
     QStringList tbHeader;
     //tbHeader << "文件名" << "大小和进度" << "速度" << "剩余" << "状态" << "gid";
-    tbHeader << tr("File name") << tr("Size") << tr("Speed") << tr("Remaining time") << tr("Status") << "gid";
+    tbHeader << tr("File name") << tr("Size") << tr("Speed") << tr("Remaining time") << tr("Status") << "gid" << "status" ;
 
     QList<TBItem> tbList;
 
@@ -129,6 +129,9 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
 //   hfont.setWeight(1);
 //   this->horizontalHeader()->setFont( hfont );
 
+
+
+
    /** 初始列宽定义 */
    this->setColumnWidth( 0 ,300 );
    this->setColumnWidth( 1 ,100 );
@@ -138,6 +141,7 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
 
    //this->setColumnHidden( 4,true );
    this->setColumnHidden( 5,true );
+   this->setColumnHidden( 6,true );
 
 
    /** 代理 进度条 */
@@ -151,6 +155,9 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
 
    tableHead  = this->horizontalHeader();
    tableHead->setSortIndicator(1,Qt::AscendingOrder);
+
+   tableHead->setHighlightSections(false);
+
    //tableHead->setSortIndicatorShown(true);
    connect( tableHead, SIGNAL(sectionClicked(int)), this, SLOT(view_sort(int)));
 
@@ -253,11 +260,14 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
 
     }
 
-
+    int speedInt = 0;
     QString Speed = "";
     if( tbitem.Speed.toInt(NULL,10) > 0 ){
-       Speed =  QString::number( tbitem.Speed.toInt(NULL,10) / 1024 ) + " KB/S";
+       Speed =  QString::number( tbitem.Speed.toInt(NULL,10) / 1024 ) + " Kb/S";
+       speedInt = tbitem.Speed.toInt(NULL,10);
     }
+
+
 
     QString RestTime = "";
     if( tbitem.RestTime.split("|").size() == 2   ){
@@ -265,13 +275,34 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
         QStringList t = tbitem.RestTime.split("|");
         if(  t.at(1).toInt(NULL,10) >0  && t.at(0).toInt(NULL,10) >0 ){
           RestTime = QString::number( t.at(1).toInt(NULL,10) / 1024 / 1024 )+ " MB / "+QString::number( t.at(0).toInt(NULL,10) / 1024 / 1024 ) + " MB";
+
+          int t0 = t.at(0).toInt(NULL,10);
+          int t1 = t.at(1).toInt(NULL,10);
+          /**
+           * 计算时间
+           */
+           //17.8G×1024×1024÷300＝***秒
+          int bCountSize =  t0 - t1 ;
+          bCountSize = bCountSize * 1024 * 1024;
+          if ( bCountSize > 0 && speedInt >0 ){
+
+              int testTime =  bCountSize / speedInt;
+              qDebug() << "testTime "<< testTime;
+
+              //int minutes = testTime % 3600 / 60;
+              RestTime = QString::number( testTime ) + " time";
+
+
+          }
+
+
         }
     }
 
 
     qDebug() << "filename: " << filename;
 
-    SetItemData( row, 0,  filename + " XXX");
+    SetItemData( row, 0,  filename );
     if( tbitem.Progress == "0" ){
 
         SetItemData( row, 1,  "");
@@ -283,16 +314,63 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
 
     SetItemData( row, 2,  Speed );
     SetItemData( row, 3,  RestTime );
-    SetItemData( row, 4,  tbitem.State );
+
+ /**
+    文案：
+    【全部任务】【All tasks】
+    【下载中】【Downloading】
+    【已暂停】【Paused】
+    【已完成】【Finished】
+    【回收站】【Trash】
+    【文件名】【File name】
+    【大小】【Size】
+    【速度】【Speed】
+    【剩余时间】【Remaining time】
+    【状态】【Status】
+    【已删除】【Deleted】
+ **/
+
+    QString StateStr = "";
+    if( tbitem.State == "active" ){
+
+        StateStr = tr( "Downloading" );
+
+    } else if ( tbitem.State == "waiting" ){
+
+        StateStr = tr( "Paused" );
+
+    } else if ( tbitem.State == "paused" ){
+
+        StateStr = tr( "Paused" );
+
+    } else if ( tbitem.State == "error" ){
+
+        StateStr = tr( "error" );
+
+    } else if ( tbitem.State == "complete" ){
+
+        StateStr = tr( "Finished" );
+
+    } else if ( tbitem.State == "removed" ){
+
+        StateStr = tr( "Deleted" );
+
+    }else{
+
+        //StateStr = tr( "Deleted" );
+    }
+
+    SetItemData( row, 4,  StateStr );
+
     SetItemData( row, 5,  tbitem.gid );
+    SetItemData( row, 6,  tbitem.State );
 
     m_dataModel->item( row , 1 )->setTextAlignment(Qt::AlignCenter);
     //m_dataModel->item( row , 2 )->setTextAlignment(Qt::AlignCenter);
     //m_dataModel->item( row , 3 )->setTextAlignment(Qt::AlignCenter);
     //m_dataModel->item( row , 4 )->setTextAlignment(Qt::AlignCenter);
-
     this->setColumnHidden( 5,true );
-
+    this->setColumnHidden( 6,true );
 }
 
 void DownListView::SetItemData( int row,int col,QString vStr  ){
@@ -322,11 +400,11 @@ void DownListView::ItemDBClick( QModelIndex index){
 
 void DownListView::UpdateTable(  QList<TBItem>  tbList ){
 
-
+    qDebug() << "UpdateTable(  QList<TBItem>  tbList ) " ;
     /** 记录下此时 listView 中已选择的行 */
     const QModelIndexList selected = this->selectionModel()->selectedRows();
 
-    ClearAllItem();
+    //ClearAllItem();
     //填充数据表
 
     for( int i = 0 ; i < tbList.size() ; i++  ){

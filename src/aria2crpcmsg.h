@@ -45,6 +45,11 @@ public:
 /** 返回错误 */
     void ReturnError( QString error_t );
 
+    /**
+     * 临时处置下载路径设置
+     */
+    void SendMsgAria2c_SetSavePath( QString SavePath  );
+
 /** 任务处理 */
     //"addUri"
     void SendMsgAria2c_addUri(  QString uri ,QString id   );

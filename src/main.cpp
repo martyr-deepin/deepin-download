@@ -30,9 +30,8 @@ DWIDGET_USE_NAMESPACE
 int main(int argc, char *argv[])
 {
 
+
     QString fileURL = "";
-
-
     /**
      * 命令行参数
      **/
@@ -71,8 +70,8 @@ int main(int argc, char *argv[])
     /**
      * 日志
      */
-    Dtk::Core::DLogManager::registerFileAppender();
-    Dtk::Core::DLogManager::registerConsoleAppender();
+    //Dtk::Core::DLogManager::registerFileAppender();
+    //Dtk::Core::DLogManager::registerConsoleAppender();
 
     /**
     * 单例测试
@@ -110,10 +109,12 @@ int main(int argc, char *argv[])
     MainWindow window;
 
     Utils::applyQss(&window, "main.qss");
+
     QScreen *screen = QGuiApplication::primaryScreen();
     QRect  screenGeometry = screen->geometry();
     window.setMinimumSize(QSize(screenGeometry.width() * 1 / 2, screenGeometry.height() * 1 / 2));
     Dtk::Widget::moveToCenter(&window);
+
     window.show();
 
     /**

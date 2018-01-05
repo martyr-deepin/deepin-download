@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QComboBox>
 //#include <QLineEdit>
 #include <ddialog.h>
 
@@ -22,15 +23,17 @@ public:
     void ClearEdit();
 private:
 
+    void SelectSaveDir();
     MainWindow  *mainUI;
     QTextEdit   *Edit1;    
     QLabel      *msg;
+    QComboBox   *selSavePath;
     QString     GetThunderUrl(  QString thunder_url );
     int         dtype = 0;
     QString     dPath = "";
+    QString     SavePath = "";
 
 signals:
-
 
 
 private slots:

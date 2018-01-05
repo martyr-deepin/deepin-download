@@ -19,29 +19,50 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) :Dtk::Widget::DDialog(par
     this->mainUI = mainUI;
 
     setTitle( tr("New task") );
-
+    //QLabel *title = new QLabel( tr("New task") );
+    //this->titlebar()->setCustomWidget(title, Qt::AlignVCenter, false);
 
     QWidget *form = new QWidget;
     QVBoxLayout  *vbLayout = new QVBoxLayout;
     form->setLayout( vbLayout );
     Edit1 = new QTextEdit;
-    Edit1->setFixedHeight( 240 );
+    Edit1->setFixedHeight( 180 );
     Edit1->setStyleSheet("QTextEdit{border:1px solid #f3f3f3;}");
-    QPushButton *openFileDlg = new QPushButton( "torrent　|　metalink　Down file" );
+
+
+    QPushButton *openFileDlg = new QPushButton( QIcon( ":Resources/images/torrent.svg" ), "torrent　|　metalink　Down file" );
+
+    openFileDlg->setObjectName("openFileDlg");
+    // openFileDlg->setIcon(QIcon(":/Resources/images/logo@2x.png"));
+    openFileDlg->setText(" " + QString("open Torrent file"));
+    openFileDlg->setStyleSheet("#openFileDlg{ qproperty-icon: url(:Resources/images/torrent.svg);qproperty-iconSize:32px 32px;color:#0000FF;}");
+    qDebug() << openFileDlg;
+/**
+    QPixmap *pixmap = NULL;
+    pixmap = new QPixmap(64, 64);
+    pixmap->load( ":Resources/images/torrent.svg" );
+    QIcon *icon = new QIcon(*pixmap);
+    QPushButton *button = new QPushButton(*icon, "");
+    button->setIconSize(QSize(64, 64));
+**/
 
     QWidget *SaveSetup = new QWidget;
     QFormLayout *SS = new QFormLayout;
     SaveSetup->setLayout( SS );
     QLabel *text = new QLabel(tr("Save to"));
-    QComboBox *text2 = new QComboBox;
+    selSavePath = new QComboBox;
     QString HomeDir = QDir::homePath();
     QString Downloads = HomeDir + "/Downloads";
-    //QString Desktop = HomeDir + "/Downloads";
-    text2->addItem( "Downloads",Downloads  );
-    //text2->addItem( "桌面",Downloads  );
-    SS->addRow( text ,text2);
+    QString Desktop = HomeDir + "/Desktop";
+    selSavePath->addItem( QIcon( ":Resources/images/folder-downloads.svg" ), "Downloads",Downloads  );
+    selSavePath->addItem( QIcon( ":Resources/images/folder-desktop.svg" ),"Desktop",Desktop );
+    selSavePath->addItem( "...","..." );
+    SS->addRow( text ,selSavePath );
+
+    selSavePath->setCurrentIndex( 0 );
 
     vbLayout->addWidget( Edit1 );
+    //vbLayout->addWidget( button );
     vbLayout->addWidget( openFileDlg );
     vbLayout->addWidget( SaveSetup );
 
@@ -51,20 +72,94 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) :Dtk::Widget::DDialog(par
     addContent( form );
     addContent( msg );
     int btn1 = addButton( tr("Cancel"), false);
-    int btn2 = addButton( tr("Download"), true, DDialog::ButtonWarning);
+    int btn2 = addButton( tr("Download"), true, DDialog::ButtonRecommend );
 
     setOnButtonClickedClose( false );
 
     this->setFixedSize( 540,400 );
-    //setWindowFlags( /**Qt::FramelessWindowHint  | */ Qt::WindowStaysOnTopHint );
+    setWindowFlags( /**Qt::FramelessWindowHint  | */ Qt::WindowStaysOnTopHint );
 
     connect( this, &Dtk::Widget::DDialog::buttonClicked,this,&NewDown::buttonClicked );
     //connect( button1, &QPushButton::clicked,this,&NewDown::Button1Click );
     //connect( button2, &QPushButton::clicked,this,&NewDown::Button2Click );
     connect( openFileDlg, &QPushButton::clicked,this,&NewDown::openFileDlg );
 
+
+    connect( selSavePath, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[=](int index){
+/**
+            QString SelPathStr = selSavePath->currentData().toString();
+            qDebug()<< index << SelPathStr;
+
+            if( SelPathStr == "..."){
+
+                SelectSaveDir();
+
+            }else{
+                msg->setText( "保存路径：" + SelPathStr );
+            }
+**/
+     });
+
+
+    connect( selSavePath, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),[=](int index){
+
+            //QString SelPathStr = selSavePath->currentData().toString();
+            QString SelPathStr = selSavePath->currentData().toString();
+            qDebug()<< index << SelPathStr;
+
+            if( SelPathStr == "..."){
+
+                SelectSaveDir();
+
+            }else{
+                msg->setText( "保存路径：" + SelPathStr );
+            }
+
+     });
+
+
+
+    msg->setText( "保存路径：" + Downloads );
+
+    this->SavePath = Downloads;
+
 }
 
+void NewDown::SelectSaveDir(){
+
+    QString dir = QFileDialog::getExistingDirectory( this,
+                                                     tr("Open Directory"),
+                                                     "/home",
+                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+
+   //msg->setText( dir );
+
+   QFile file( dir + "/testcreate.gc" );
+   if ( file.open( QIODevice::ReadWrite | QIODevice::Text ) ){
+
+       qDebug() << "OK";
+
+       //selSavePath->setCurrentText( dir );
+       msg->setText( "保存路径：" + dir );
+
+       this->SavePath = dir;
+
+   }else{
+       qDebug() << "Error....";
+       /**
+        * 创建打开测试文件失败，选择的这个路径有可能不能写无权限等
+        **/
+       msg->setText( "该路径不能用于保存下载文件" );
+
+       this->SavePath = "";
+   }
+   file.close();
+   QFile::remove( dir + "/testcreate.gc" );
+
+
+   //selSavePath->setCurrentIndex( -1 );
+
+}
 
 void NewDown::buttonClicked(int index, const QString &text){
 
@@ -154,7 +249,7 @@ int NewDown::Button2Click(){
 
               if ( url.trimmed() != "" ){
 
-                  mainUI->AppendDownUrl(  url );
+                  mainUI->AppendDownUrl( url ,this->SavePath );
               }
           }
        }
@@ -172,6 +267,7 @@ int NewDown::Button2Click(){
    }
 
 
+   Edit1->setText("");
 }
 
 void NewDown::ClearEdit(){

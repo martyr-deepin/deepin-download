@@ -31,9 +31,12 @@ CloseWindowMsgBox::CloseWindowMsgBox()
     addContent(checkBox);
 
     addButton(tr("Cancel"), false);
-    addButton(tr("OK"), true, DDialog::ButtonWarning);
+    addButton(tr("OK"), true, DDialog::ButtonRecommend);
+
+    setWindowFlags( /**Qt::FramelessWindowHint  | */ Qt::WindowStaysOnTopHint );
 
     connect( this,&Dtk::Widget::DDialog::buttonClicked,this,&CloseWindowMsgBox::buttonClicked );
+
 
 }
 

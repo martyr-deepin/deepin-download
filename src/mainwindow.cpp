@@ -45,12 +45,15 @@
 #include "dthememanager.h"
 #include "utils.h"
 
-#include "DStandardPaths"
-
+#include <QScreen>
+#include "dtkwidget_global.h"
 
 #define  SLEEPSS          2000
+#define  TDSTATUS         6
+#define  TDGID            5
 
 MainWindow::MainWindow(DMainWindow *parent) :DMainWindow( parent){
+
 
     initMainWindow();
 }
@@ -134,11 +137,10 @@ void MainWindow::initMainWindow(){
     /** 选项配置 */
     configDlg  =   new ConfigDlg;
 
-    /** 关于 */
+    /** 自定义关于框 */
     aboutDlg  = new AboutDlg;
 
     /** 浮窗 */
-
     //mwm  = new MWM( this );
     //mwm->ShowMWM();
 
@@ -148,6 +150,7 @@ void MainWindow::initMainWindow(){
     /**
      * 初始化计时器
      */
+    /**
     m_Active = new QTimer( this );
     m_Stop   = new QTimer( this );
     m_Wait   = new QTimer( this );
@@ -162,6 +165,29 @@ void MainWindow::initMainWindow(){
     connect( m_Stop, SIGNAL(timeout()), this, SLOT( GetStopList()) );
     connect( m_Wait, SIGNAL(timeout()), this, SLOT( GetWaitList()) );
     connect( m_All, SIGNAL(timeout()), this, SLOT( UpdateDownStatus()) );
+    **/
+
+    thread = new QThread(this);
+    workThread = new GCThread( this->downDB );
+
+    //QObject::connect( thread, SIGNAL(started()), workThread, SLOT( work() )/*,Qt::AutoConnection*/ );
+
+    workThread->moveToThread( thread );
+    thread->start();
+
+    QObject::connect( workThread, SIGNAL( NetworkReply( QList<TBItem*>* ) ) , this, SLOT( OnNetworkReply( QList<TBItem*>* ) ) ,Qt::QueuedConnection );
+    QObject::connect( workThread, SIGNAL( NetworkReplyNode( TBItem* ) ) , this, SLOT( OnNetworkReplyNode( TBItem* ) ) ,Qt::QueuedConnection );
+
+    //workThread->start();
+    threadTimer = new QTimer;
+    QObject::connect( threadTimer, SIGNAL(timeout()), workThread, SLOT( work() ),Qt::AutoConnection );
+
+    threadTimer->start( SLEEPSS );
+
+    /**
+     * 开启 全部任务状态刷新    
+    m_All->start();
+    **/
 
     /**
      * 左侧边栏监听
@@ -173,12 +199,6 @@ void MainWindow::initMainWindow(){
     connect( toolbar, SIGNAL(SearchfocusOut()), this, SLOT( SearchfocusOut() ) );
 
     //////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * 开启 全部任务状态刷新
-     */
-    m_All->start();
-
 
     /**
      * 系统关于菜单
@@ -202,7 +222,12 @@ void MainWindow::initMainWindow(){
     //wThread = new GCThread( this );
 
     /** 状态栏文本设置 */
-    SetBottomStatusText("");
+   SetBottomStatusText("");
+
+
+   /** 默认切换到全部任务 */
+   slidebar->SetSelectRow( 5 );
+   slidebar->SetSelectRow( 0 );
 
 }
 
@@ -262,7 +287,8 @@ void MainWindow::closeEvent(QCloseEvent *event){
 
         }else{
           //最小化
-            showMinimized(); //最小化
+            //showMinimized(); //最小化
+            this->hide();
             event->ignore();
         }
 
@@ -290,7 +316,8 @@ void MainWindow::closeEvent(QCloseEvent *event){
             configIniWrite->setValue("/Config/ExitModel", 0 );
         }else{
             //最小化到托盘
-            showMinimized(); //最小化
+            //showMinimized(); //最小化
+            this->hide();
             event->ignore();
             configIniWrite->setValue("/Config/ExitModel", 1 );
         }
@@ -357,6 +384,14 @@ void MainWindow::SelSlideItem( int row ){
     //wThread->setFunction( 0 );
     this->downListView->ClearAllItem();
 
+    //workThread->moveToThread( thread );
+    if( threadTimer != nullptr && threadTimer->isActive() ){
+
+        threadTimer->stop();
+    }
+
+
+/**
     if ( m_Active->isActive() )
         m_Active->stop();
 
@@ -368,6 +403,7 @@ void MainWindow::SelSlideItem( int row ){
 
     //if ( m_All->isActive() )
     //    m_All->stop();
+**/
 
     qDebug()<< "slideBar.currentRowChanged: " << row;
 
@@ -377,20 +413,26 @@ void MainWindow::SelSlideItem( int row ){
 
     switch ( row ) {
 
+    case 0:
+
+        workThread->SetControl( 0 );
+        threadTimer->start( SLEEPSS );
+        break;
+
     case 1:   //下载中
 
-        m_Active->start();
-        //wThread->setFunction( 1 );
+        workThread->SetControl( 1 );
+        threadTimer->start( SLEEPSS );
         break;
     case 2:   //队列中
 
-        m_Wait->start();
-        //wThread->setFunction( 3 );
+        workThread->SetControl( 2 );
+        threadTimer->start( SLEEPSS );
         break;
     case 3:   //已完成
 
-        m_Stop->start();
-        //wThread->setFunction( 2 );
+        workThread->SetControl( 3 );
+        threadTimer->start( SLEEPSS );
         break;
 
     //case 4:   // 历史记录
@@ -405,11 +447,18 @@ void MainWindow::SelSlideItem( int row ){
         break;
 
     default:  //全部任务
-        m_All->start();
+        //m_All->start();
         break;
     }
 
-    //wThread->start();
+    if( 4 != row ){
+
+        waterProgress->setValue( 45 );
+        waterProgress->setVisible( true );
+        waterProgress->start();
+    }
+
+
 }
 
 
@@ -530,10 +579,15 @@ void MainWindow::LoadTrayIcon(){
 void MainWindow::LoadTableView( QWidget *centerWidget ){
 
     downListView =  new DownListView( this,centerWidget );
+    waterProgress = new Dtk::Widget::DWaterProgress;
+    waterProgress->setFixedSize(50, 50);
+    waterProgress->setVisible( false );
 
     //m_ContextMenu = new QMenu;
-    QVBoxLayout *layout = new QVBoxLayout;
+    QVBoxLayout *layout = new QVBoxLayout;    
     layout->addWidget( downListView );
+    layout->addWidget( waterProgress, 0, Qt::AlignCenter);
+
     //layout->setContentsMargins(0,0,0,0);
     centerWidget->setLayout( layout );
 
@@ -548,7 +602,10 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
           hfont.setWeight(1);
           downListView->horizontalHeader()->setFont( hfont );
 **/
-          QString status =  modelIndex.sibling( modelIndex.row(),4 ).data().toString();
+          /**
+           * 6 ==> status
+           */
+          QString status =  modelIndex.sibling( modelIndex.row(), TDSTATUS ).data().toString();
           qDebug() << "Select Status : " << status;
 
           if( status == "active" ){   //活动
@@ -718,7 +775,7 @@ void MainWindow::AgainDown(){
 
     foreach( const QModelIndex & index, selected){
 
-        QString gid = index.sibling( index.row() ,5 ).data().toString();
+        QString gid = index.sibling( index.row() , TDGID ).data().toString();
 
         if ( gid == ""  ) continue;
 
@@ -750,7 +807,7 @@ void MainWindow::CopyUrlToBoard(){
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
     foreach( const QModelIndex & index, selected){
 
-        QString gid = index.sibling( index.row() ,5 ).data().toString();
+        QString gid = index.sibling( index.row() , TDGID ).data().toString();
         if ( gid != ""  ){
 
             QString URL = downDB->GetDownUrlPath( gid );
@@ -779,7 +836,7 @@ void MainWindow::OpenDownFile(){
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
     foreach( const QModelIndex & index, selected){
 
-        QString gid = index.sibling( index.row() ,5 ).data().toString();
+        QString gid = index.sibling( index.row() , TDGID ).data().toString();
         if ( gid != ""  ){
 
             QString SavePath = downDB->GetDownSavePath( gid );
@@ -806,7 +863,7 @@ void MainWindow::RemoveAria2Cache(){
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
     foreach( const QModelIndex & index, selected){
 
-        QString gid = index.sibling( index.row() ,5 ).data().toString();
+        QString gid = index.sibling( index.row() , TDGID ).data().toString();
 
         if ( gid != ""  ){
 
@@ -894,7 +951,7 @@ void MainWindow::DeleteDownFileDB(){
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
     foreach( const QModelIndex & index, selected){
 
-        QString gid = index.sibling( index.row() ,5 ).data().toString();
+        QString gid = index.sibling( index.row() , TDGID ).data().toString();
         if ( gid != ""  ){
 
             QString filePath = downDB->GetDownSavePath( gid );
@@ -931,12 +988,11 @@ void MainWindow::DeleteDownFileDB(){
 
 void MainWindow::Remove(){
 
-
     const QModelIndexList selected = downListView->selectionModel()->selectedRows();
 
     foreach( const QModelIndex & index, selected){
-        QString gid = index.sibling( index.row() ,5 ).data().toString();
-        //QString status = index.sibling( index.row() ,4).data().toString();
+        QString gid = index.sibling( index.row() , TDGID ).data().toString();
+        //QString status = index.sibling( index.row() , TDSTATUS ).data().toString();
         if ( gid != ""  ){
 
             aria2c->SendMsgAria2c_pause( gid );
@@ -947,13 +1003,13 @@ void MainWindow::Remove(){
             qDebug() << "Remove :" << gid;
             downDB->SetDTaskStatus( d );
 
+            if(  GetSlideSelRow() == 0  ){
+
+                downListView->m_dataModel->removeRow( index.row() );
+            }
 
         }
-
     }
-
-
-
 }
 
 /**
@@ -965,8 +1021,12 @@ void MainWindow::Pause(){
 
     foreach( const QModelIndex & index, selected){
 
-        QString gid = index.sibling( index.row() ,5 ).data().toString();
-        QString status = index.sibling( index.row() ,4 ).data().toString();
+        QString gid = index.sibling( index.row() , TDGID ).data().toString();
+
+        /**
+         * 6 ==> status
+         */
+        QString status = index.sibling( index.row() , TDSTATUS ).data().toString();
 
         if ( status == "active"  ){
             aria2c->SendMsgAria2c_pause( gid );
@@ -983,9 +1043,12 @@ void MainWindow::UnPause(){
 
     foreach( const QModelIndex & index, selected){
 
-        QString gid = index.sibling( index.row() ,5 ).data().toString();
-        QString status = index.sibling( index.row() ,4 ).data().toString();
+        QString gid = index.sibling( index.row() , TDGID ).data().toString();
+        QString status = index.sibling( index.row() , TDSTATUS ).data().toString();
 
+        /**
+         * 6 ==> status
+         */
         if ( status == "paused"  ){
             aria2c->SendMsgAria2c_unpause( gid );
         }
@@ -1105,7 +1168,11 @@ void MainWindow::LoadDownList(){
 
 }
 
-void MainWindow::AppendDownUrl( QString urlStr  ){
+void MainWindow::AppendDownUrl( QString urlStr ,QString SavePath ){
+
+   qDebug() << SavePath;
+
+   aria2c->SendMsgAria2c_SetSavePath( SavePath  );
 
    QString ID = downDB->AppendDTask(  urlStr );  //添加数据库记录
    aria2c->SendMsgAria2c_addUri( urlStr ,ID  );
@@ -1115,7 +1182,7 @@ void MainWindow::AppendDownUrl( QString urlStr  ){
 
 }
 
-void MainWindow::AppendDownBT( QString btfilepath   ){
+void MainWindow::AppendDownBT( QString btfilepath ,QString SavePath  ){
 
     QString ID = downDB->AppendDTask(  btfilepath ,"2" ); //添加数据库记录
     aria2c->SendMsgAria2c_addTorrent( btfilepath ,ID  );
@@ -1124,7 +1191,7 @@ void MainWindow::AppendDownBT( QString btfilepath   ){
     slidebar->SetSelectRow( 1 );
 }
 
-void MainWindow::AppendDownMetalink( QString Metalinkfilepath   ){
+void MainWindow::AppendDownMetalink( QString Metalinkfilepath ,QString SavePath  ){
 
     QString ID = downDB->AppendDTask(  Metalinkfilepath ,"3" ); //添加数据库记录
     aria2c->SendMsgAria2c_addMetalink( Metalinkfilepath ,ID );
@@ -1208,7 +1275,7 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
 
             //qDebug()<< downListView->m_dataModel->index(i,0).data().toString();
 
-            QString gid =  downListView->m_dataModel->index(i,5).data().toString();
+            QString gid =  downListView->m_dataModel->index(i, TDGID ).data().toString();
 
             if ( gid == tbitem.gid  ){
 
@@ -1252,9 +1319,190 @@ void MainWindow::UpdateGUI_StatusMsg( TBItem tbitem ){
     }
 }
 
+
+void MainWindow::OnNetworkReplyNode( TBItem* tbitem ){
+
+    qDebug() << "OnNetworkReplyNode form GCThread....";
+
+    waterProgress->setValue(100);
+    waterProgress->start();
+    waterProgress->setVisible( false );
+
+    //qDebug() << "*********** UpdateGUI_StatusMsg : " << tbitem.uri << tbitem.Progress << " ********** " ;
+
+    //downDB->SetDownSavePath( tbitem->gid ,tbitem->savepath );
+    /** 频繁 SQLite UPDATE 记录疑似引起主线程卡顿 */
+    if ( downDB->GetDownSavePath( tbitem->gid ) == ""  ){
+
+        downDB->SetDownSavePath( tbitem->gid ,tbitem->savepath );
+    }
+
+    /** 更新进度到浮窗 */
+    //UpdateMWM( tbitem.Progress );
+
+    if( this->GetSlideSelRow() == 0  ){
+
+        /** 记录下此时 listView 中已选择的行 */
+        const QModelIndexList selected = downListView->selectionModel()->selectedRows();
+
+        bool findN = false;
+        for( int i = 0 ; i < downListView->m_dataModel->rowCount();i++ ){
+
+            //qDebug()<< downListView->m_dataModel->index(i,0).data().toString();
+
+            QString gid =  downListView->m_dataModel->index(i, TDGID ).data().toString();
+
+            /**
+             * 移除掉已经被标记删除的
+
+             */
+            int Dtype = downDB->GetDTaskInfo( gid ).type;
+            if( Dtype == 3 ){
+
+                //downListView->m_dataModel->removeRow( i );
+                continue;
+            }
+
+            if ( gid == tbitem->gid  ){
+
+                downListView->SetItemData( i ,*tbitem );
+                findN = true;
+                break;
+            }
+
+        }
+
+        if( ! findN ){
+
+            downListView->InsertItem( downListView->m_dataModel->rowCount() ,*tbitem );
+        }
+
+        /**
+         * 恢复此前 listView 已选择行的高亮
+         */
+        QItemSelection sel;
+        foreach( const QModelIndex & index, selected){
+            QItemSelectionRange readSel( index );
+            sel.append( readSel );
+        }
+        downListView->selectionModel()->select( sel ,QItemSelectionModel::Select|QItemSelectionModel::Rows );
+
+    }
+
+    /** 在数据库表中记录 已完成的任务 */
+    if ( tbitem->State == "complete" ){
+        int dbt_Type = downDB->GetDTaskInfo( tbitem->gid ).type;
+        /** 3人为标记为删除*/
+        if ( dbt_Type != 4 && dbt_Type != 3 ){
+
+           DDRecord t;
+           t.gid = tbitem->gid;
+           t.type = 4 ;   //4 标注已完成
+           downDB->SetDTaskStatus( t );
+           //%1 has been downloaded successfully
+           ShowMessageTip( tr("%1 has been downloaded successfully").arg( tbitem->uri )  );
+        }
+    }
+
+}
+
 /**
 *
 **/
+void MainWindow::OnNetworkReply( QList<TBItem*> *tbList ){
+
+    qDebug() << "OnNetworkReply form GCThread....";
+
+    //qDebug() << tbList->at(0)->gid;
+
+    waterProgress->setValue(100);
+    waterProgress->start();
+    waterProgress->setVisible( false );
+
+    /** 记录下此时 listView 中已选择的行 */
+    const QModelIndexList selected = downListView->selectionModel()->selectedRows();
+
+    /** 频繁 清空再重填 疑引起卡顿 */
+    downListView->ClearAllItem();
+
+    int acount = 0;
+    int zcount = 0;
+    for( int i = 0 ; i < tbList->size() ; i++  ){
+
+        /** 过滤掉不能下载的 */
+        if( tbList->at(i)->savepath == "" ){
+             continue;
+        }
+
+        /** 过滤掉出错和已移除的 */
+        if(  tbList->at(i)->State == "error" || tbList->at(i)->State == "removed"   ){
+             continue;
+        }
+
+        /** 过滤掉已经被标记删除的 */
+        int Dtype = downDB->GetDTaskInfo( tbList->at(i)->gid ).type;
+        if( Dtype == 3 ){
+             continue;
+        }
+
+        /** 频繁 清空再重填 疑引起卡顿 */
+        downListView->InsertItem( downListView->m_dataModel->rowCount(),*tbList->at(i) );
+
+
+        //mwm->UpdateMWM(  tbList.at(i).Progress );
+        /** 频繁 SQLite UPDATE 记录疑似引起主线程卡顿 */
+        //downDB->SetDownSavePath( tbList->at(i)->gid ,tbList->at(i)->savepath );
+        /**
+         * 2018-01-03 修
+         * 加判断 ，SELECT 消耗远小于 UPDATE
+         */
+        if ( downDB->GetDownSavePath( tbList->at(i)->gid ) == "" ){
+
+            downDB->SetDownSavePath( tbList->at(i)->gid ,tbList->at(i)->savepath );
+        }
+
+        downDB->AppendBTask( *tbList->at(i) );
+
+        if( tbList->at(i)->State == "active" ){
+
+            acount++;
+        }
+        zcount++;
+        //tr("Deleted");
+    }
+
+    /**
+     * 恢复此前 listView 已选择行的高亮
+     */
+    QItemSelection sel;
+    foreach( const QModelIndex & index, selected){
+        QItemSelectionRange readSel( index );
+        sel.append( readSel );
+    }
+    downListView->selectionModel()->select( sel ,QItemSelectionModel::Select|QItemSelectionModel::Rows );
+
+    if( acount >= 1 && zcount >= 1  ){
+
+        if( acount == 1 ){
+
+            SetBottomStatusText( tr("%1 task is processing,").arg( acount ) +" " + tr("total %1 task(s)").arg( zcount )  );
+
+        }else{
+
+            SetBottomStatusText( tr("%1 tasks are processing,").arg( acount ) +" " + tr("total %1 task(s)").arg( zcount ) );
+        }
+
+
+    }else{
+
+        //total %1 task(s)
+        SetBottomStatusText( tr("total %1 task(s)").arg( zcount ) );
+    }
+
+
+
+}
+
 void MainWindow::UpdateGUI_StatusMsg(  QList<TBItem>  tbList ){
 
 
@@ -1342,6 +1590,9 @@ void MainWindow::UpdateGUI_CommandMsg( QJsonObject nObj ){
 */
 void MainWindow::RecycleList(){
 
+
+    waterProgress->setVisible( false );
+
     downListView->ClearAllItem();
 
     QList<DDRecord> t = this->downDB->ReadRecycleList();
@@ -1409,6 +1660,7 @@ void MainWindow::ShowTrayMenu(){
 void MainWindow::ShowWindow(){
 
     if ( ! this->isVisible()  ){
+
 
         this->show();
     }
@@ -1545,6 +1797,9 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         QModelIndex  modelindex = this->downListView->indexAt( point );
         qDebug() << "ROW ======> " << modelindex.row() + 1;
 
+        const QModelIndexList selected = downListView->selectionModel()->selectedRows();
+
+        int rowcount = downListView->m_dataModel->rowCount();
 
         QAction *RMenuItem[10];
 
@@ -1559,7 +1814,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         RMenuItem[2] = new QAction( tr("Delete") ,this);      //删除 Remove
         RMenuItem[2]->setData( "3");
 
-        RMenuItem[3] = new QAction( "property" ,this);        //属性
+        RMenuItem[3] = new QAction( "-" ,this);                //排序
         RMenuItem[3]->setData( "4");
 
         downListView->m_ContextMenu->addSeparator();
@@ -1597,33 +1852,37 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
         QAction *sortStatus = new QAction( tr("Status"),this);//按状态 Status
         sortStatus->setData("104");
 
-        //connect(   )
 
         for( int i = 0 ; i < 9 ; i++){
 
-            if( i == 3 ){
+            if( i == 3  ){ //RMenuItem[3]
 
-                sortbyMenu = downListView->m_ContextMenu->addMenu( tr("Sort by") );
-                sortbyMenu->addAction( sortTime );
-                sortbyMenu->addAction( sortName );
-                sortbyMenu->addAction( sortSize );
-                sortbyMenu->addAction( sortStatus );
+                /** 只有空白处（ 未选择任何记录 ）才有排序**/
+                if( selected.count() == 0 && rowcount >= 1  ){
+
+                    sortbyMenu = downListView->m_ContextMenu->addMenu( tr("Sort by") );
+                    sortbyMenu->addAction( sortTime );
+                    sortbyMenu->addAction( sortName );
+                    sortbyMenu->addAction( sortSize );
+                    sortbyMenu->addAction( sortStatus );
+                }
+
                 continue;
             }
 
             downListView->m_ContextMenu->addAction( RMenuItem[i]  );
         }
 
-        //RMenuItem[3]->setVisible( false );
-        RMenuItem[7]->setVisible( false );
-        //RMenuItem[8]->setVisible( false );
+
+        RMenuItem[7]->setVisible( false );  //隐藏删除下载记录
+        RMenuItem[8]->setVisible( false );  //隐藏清空回收站
 
         /**
          *  根据侧边栏选择项改变状态
          */
         ////////////////////////////////////////////////////////////////////////////
 
-        const QModelIndexList selected = downListView->selectionModel()->selectedRows();
+
         if ( selected.count() == 0 ){
             qDebug() << "未有选择任何记录";
 
@@ -1639,23 +1898,40 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
 
             switch ( SlideSelRow ) {
                 case 0:
+                    if ( selected.count() > 0 ){
+
+                    }else{
+
+                    }
                     break;
                 case 1:  // 下载中
-                    RMenuItem[3]->setDisabled(true);
-                    RMenuItem[4]->setDisabled(true);
-                    RMenuItem[5]->setDisabled(true);
-                    RMenuItem[8]->setDisabled(true);
+                    if ( selected.count() > 0 ){
+
+                        RMenuItem[3]->setDisabled(true);
+                        RMenuItem[4]->setDisabled(true);
+                        RMenuItem[5]->setDisabled(true);
+                        RMenuItem[8]->setDisabled(true);
+                    }else{
+
+                    }
                     break;
                 case 2:  // 已暂停
-                    RMenuItem[3]->setDisabled(true);
-                    RMenuItem[4]->setDisabled(true);
-                    RMenuItem[5]->setDisabled(true);
-                    RMenuItem[8]->setDisabled(true);
+                    if ( selected.count() > 0 ){
+                        RMenuItem[3]->setDisabled(true);
+                        RMenuItem[4]->setDisabled(true);
+                        RMenuItem[5]->setDisabled(true);
+                        RMenuItem[8]->setDisabled(true);
+                    }else{
+                    }
                     break;
                 case 3:   //已完成
-                    RMenuItem[0]->setDisabled(true);
-                    RMenuItem[1]->setDisabled(true);
-                    RMenuItem[2]->setDisabled(false);
+                    if ( selected.count() > 0 ){
+                        RMenuItem[0]->setDisabled(true);
+                        RMenuItem[1]->setDisabled(true);
+                        //RMenuItem[2]->setDisabled(f);
+                        RMenuItem[8]->setDisabled(true);
+                    }else{
+                    }
 
                     break;
                 /**
@@ -1668,15 +1944,23 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                     break;
                 **/
                 case 4:  //回收站
-                    RMenuItem[0]->setDisabled(true);
-                    RMenuItem[1]->setDisabled(true);
-                    RMenuItem[2]->setDisabled(true);
-                    RMenuItem[3]->setDisabled(true);
-                    RMenuItem[4]->setDisabled(false);
-                    RMenuItem[5]->setDisabled(false);
-                    RMenuItem[6]->setDisabled(false);
-                    RMenuItem[7]->setDisabled(false);
-                    RMenuItem[8]->setDisabled(false);
+                    if ( selected.count() > 0 ){
+                        RMenuItem[0]->setDisabled(true);
+                        RMenuItem[1]->setDisabled(true);
+                        RMenuItem[2]->setDisabled(true);
+                        RMenuItem[3]->setDisabled(true);
+                        RMenuItem[4]->setDisabled(false);
+                        RMenuItem[5]->setDisabled(false);
+                        RMenuItem[6]->setDisabled(false);
+                        RMenuItem[7]->setDisabled(false);
+                        RMenuItem[8]->setDisabled(false);
+                        RMenuItem[8]->setVisible( true );
+                    }else{
+
+                        RMenuItem[8]->setVisible( true );
+                        RMenuItem[8]->setEnabled( true );
+                    }
+
                     break;
                 case 6:
                     break;
@@ -1690,7 +1974,20 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
              * 根据列表选择项改变状态
              */
             QModelIndex  modelIndex = this->downListView->indexAt( point );
-            QString status =  modelIndex.sibling( modelIndex.row(),4 ).data().toString();
+
+            /**
+             * 有行被选中时，不能使用回收站 功能
+             * 且只有在回收站中
+             **/
+            if ( SlideSelRow == 4 && modelIndex.row() >= 0 ){
+
+                RMenuItem[8]->setEnabled( false );
+            }
+
+            /**
+             * 6 ==> status
+             */
+            QString status =  modelIndex.sibling( modelIndex.row(), TDSTATUS ).data().toString();
             qDebug() << "Select Status : " << status;
 
             if( status == "active" ){   //活动
@@ -1721,6 +2018,7 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
                 RMenuItem[1]->setEnabled( false );
 
             }
+
 
 
         downListView->m_ContextMenu->exec( QCursor::pos() ); // 当前鼠标位置

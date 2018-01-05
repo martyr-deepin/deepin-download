@@ -2,49 +2,48 @@
 #define GCTHREAD_H
 #include <QObject>
 #include <QThread>
-
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
-
+#include <sqlitefunt.h>
 /** ======================================= */
 
 class MainWindow;
 #include "mainwindow.h"
 /** ======================================= */
 
-class GCThread : public QThread
+class GCThread : public  QObject //QThread
 {
     Q_OBJECT
 
 public:
 
-   GCThread( MainWindow  *mainUI  );
-   void setFunction( int fCode );
-   void stop();
-   //QNetworkAccessManager *manager;
-
-protected:
-//public slots:
-   void run();
-   //void printMessage();
+   GCThread( SQLiteFunt *downDB );
+   void SetControl( int code  );
 
 private:
-   MainWindow  *mainUI;
-   volatile bool stopped;
-   volatile int  fCode;
-
-private:
-
+   SQLiteFunt *downDB;
+   int  control = 0;
    void GetWaitList();
    void GetStopList();
    void GetActiveList();
+   void UpdateDownStatus();
 
    void GCNetworkReply( QNetworkReply* reply,const QString method );
    void SendMessage( QString jsonrpc ,QString id ,QString method, QJsonArray params );
 
+   void Aria2cRMsg_tellMessage( QJsonObject nObj );
+   void Aria2cRMsg_tellStatus( QJsonObject nObj );
+
+protected:
+   void run();
+
 signals:
-    void OnNotifyQAMTest( QNetworkAccessManager *manager );
+   void NetworkReply( QList<TBItem*> *tbList );
+   void NetworkReplyNode( TBItem* tbItem );
+
+private slots:
+   void work();
 
 };
 

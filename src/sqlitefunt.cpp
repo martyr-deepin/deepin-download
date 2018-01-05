@@ -121,7 +121,7 @@ DDRecord SQLiteFunt::GetDTaskInfo( QString gid ){
        t.classn = query.value(4).toInt();
        t.savepath = query.value(5).toString();
 
-       qDebug()<< "read " << t.id + " "+ t.url << " "+ t.gid+ " "+ t.type + " " + t.classn;
+       //qDebug()<< "read " << t.id + " "+ t.url << " "+ t.gid+ " "+ t.type + " " + t.classn;
     }
 
     query.finish();
@@ -135,7 +135,7 @@ QList<DDRecord> SQLiteFunt::ReadDDTask( int type ){
     QSqlQuery query( m_dbconn );
 
     //QString sql= "select * from downlist where gid <>'0' and type <>4";
-    QString sql= "select * from downlist where gid <>'0'";
+    QString sql= "select * from downlist where gid <>'0' and type <> 3";
 
     query.exec( sql );
 
@@ -156,7 +156,7 @@ QList<DDRecord> SQLiteFunt::ReadDDTask( int type ){
            t.url  = t.savepath;
        }
 
-       qDebug()<< "read " << t.gid;
+       //qDebug()<< "read " << t.gid;
 
        ddlist.append( t );
 
@@ -193,7 +193,7 @@ QList<DDRecord> SQLiteFunt::ReadRecycleList(){
            t.url  = t.savepath;
        }
 
-       qDebug()<< "read " << t.id + " "+ t.url << " "+ t.gid+ " "+ t.type + "  " + t.classn;
+       //qDebug()<< "read " << t.id + " "+ t.url << " "+ t.gid+ " "+ t.type + "  " + t.classn;
 
        ddlist.append( t );
 
@@ -238,7 +238,7 @@ QList<DDRecord> SQLiteFunt::ReadALLTask(){
            t.url  = t.savepath;
        }
 
-       qDebug()<< "read " << t.id + " "+ t.url << " "+ t.gid+ " "+ t.type + "  " + t.classn;
+       //qDebug()<< "read " << t.id + " "+ t.url << " "+ t.gid+ " "+ t.type + "  " + t.classn;
 
        ddlist.append( t );
 

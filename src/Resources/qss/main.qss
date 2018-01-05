@@ -126,3 +126,17 @@ QProgressBar{
     text-align: center;
 }
 
+/* ///////////////////////////////////////////////////////////////////////  */
+
+
+QPushButton{
+
+}
+
+QPushButton:hover{
+
+}
+
+QPushButton:pressed{
+
+}

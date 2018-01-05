@@ -21,7 +21,10 @@
 //#include "gctoolbar.h"
 #include "gcstatusbar.h"
 #include "sqlitefunt.h"
+#include "slidebar.h"
+#include "toolbar.h"
 
+///////////////////////////////////////////////////
 
 //#include <dimagebutton.h>
 #include <QHBoxLayout>
@@ -52,10 +55,17 @@ class GCThread;
 
 
 /** =============================================== */
+
 #include <DMainWindow>
 
-#include "slidebar.h"
-#include "toolbar.h"
+
+/** */
+#include "dwaterprogress.h"
+#include "dtkwidget_global.h"
+#include "dwidget.h"
+#include "dstandardpaths.h"
+
+
 
 DWIDGET_USE_NAMESPACE
 
@@ -73,14 +83,11 @@ public:
 
 public:
     SQLiteFunt      *downDB;
-    Aria2cRPCMsg    *aria2c;
-    //QNetworkAccessManager *manager;
-
+    Aria2cRPCMsg    *aria2c;    
 
 protected:
 
-    QString CacheDir;
-    //GCThread  *wThread;
+    QString CacheDir;    
     void initMainWindow();
     void setupMenu();
     int  initAria2cWork();
@@ -99,12 +106,16 @@ private:
 
     QString         actionResult;
 
+    QThread         *thread;
+    GCThread        *workThread;
+    QTimer          *threadTimer;
+/**
     QTimer          *m_Active;
     QTimer          *m_Stop;
     QTimer          *m_Down;
     QTimer          *m_Wait;
     QTimer          *m_All;
-
+**/
     QClipboard      *board;         //剪贴板
 
     QList<TBItem>   dlist;
@@ -118,6 +129,7 @@ private:
     GCSystemTrayIcon *systemTrayIcon;   //状态栏（托盘 ）
     GCStatusBar      *statusBar;
     //QMenu            *m_ContextMenu;
+    Dtk::Widget::DWaterProgress *waterProgress;
 
     void LoadTableView( QWidget *centerWidget );
     void LoadSlideBar( QWidget *leftWidget );
@@ -176,9 +188,11 @@ private:
 public:
     void SetBottomStatusText( QString text );
     void ShowMessageTip( QString text );
-    void AppendDownBT( QString btfilepath );
-    void AppendDownUrl( QString urlStr  );
-    void AppendDownMetalink( QString Metalinkfilepath );
+
+    void AppendDownBT( QString btfilepath ,QString SavePath = ""  );
+    void AppendDownUrl( QString urlStr ,QString SavePath = "" );
+    void AppendDownMetalink( QString Metalinkfilepath ,QString SavePath = "");
+
     void OpenLinkFile( QString filenmae );
     QMenu* ShareRMenu();
     int GetSlideSelRow();
@@ -211,6 +225,9 @@ private slots:
     void SearchChang( QString  text );
     void SearchfocusOut();
     void ShowContextMenu( const QPoint &point );
+
+    void OnNetworkReply( QList<TBItem*> *tbList );
+    void OnNetworkReplyNode( TBItem* tbitem );
 
 private:
 
