@@ -134,16 +134,17 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
 
    /** 初始列宽定义 */
    this->setColumnWidth( 0 ,300 );
-   this->setColumnWidth( 1 ,300 );
+   this->setColumnWidth( 1 ,150 );
    this->setColumnWidth( 2 ,100 );
    this->setColumnWidth( 3 ,100 );
    this->setColumnWidth( 4 ,100 );
 
 
 
-   //this->setColumnHidden( 5,true );
-   //this->setColumnHidden( 6,true );
-   //this->setColumnHidden( 7,true );
+   this->setColumnHidden( 5,true );
+   this->setColumnHidden( 6,true );
+   this->setColumnHidden( 7,true );
+   this->setColumnHidden( 8,true );
 
 
    /** 代理 进度条 */
@@ -158,6 +159,9 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
    tableHead  = this->horizontalHeader();
    tableHead->setSortIndicator(1,Qt::AscendingOrder);
 
+   /**
+    * 禁止表头高亮
+    */
    tableHead->setHighlightSections(false);
 
    //tableHead->setSortIndicatorShown(true);
@@ -169,14 +173,13 @@ void DownListView::SetTableWidth( int MainWidth ){
 
     //qDebug() << "new Width " << z0;
 
-    if ( MainWidth >= 1024 ){
+    if ( MainWidth > 1024 ){
 
-        int z0 = MainWidth * 0.30;
-        int z1 = MainWidth * 0.25;
+        int z0 = MainWidth * 0.20;
+        int z1 = MainWidth * 0.15;
         int z2 = MainWidth * 0.10;
-        int z3 = MainWidth * 0.5;
+        int z3 = MainWidth * 0.10;
         int z4 = MainWidth - z0 - z1 - z3;
-
 
         this->setColumnWidth( 0 ,z0 );
         this->setColumnWidth( 1 ,z1 );
@@ -184,13 +187,16 @@ void DownListView::SetTableWidth( int MainWidth ){
         this->setColumnWidth( 3 ,z3 );
         this->setColumnWidth( 4 ,z4 );
 
+
+        qDebug() << z4;
+
     }else{
 
         this->setColumnWidth( 0 ,300 );
-        this->setColumnWidth( 1 ,100 );
-        this->setColumnWidth( 2 ,100 );
+        this->setColumnWidth( 1 ,150 );
+        this->setColumnWidth( 2 ,120 );
         this->setColumnWidth( 3 ,100 );
-        this->setColumnWidth( 4 ,100 );
+        this->setColumnWidth( 4 ,1024 - 300 - 150 - 120 - 100 );
 
     }
 
@@ -277,6 +283,7 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
     if( tbitem.RestTime.split("|").size() == 2   ){
 
         QStringList t = tbitem.RestTime.split("|");
+
         if(  t.at(1).toInt(NULL,10) >0  && t.at(0).toInt(NULL,10) >0 ){
           RestTime = QString::number( t.at(1).toInt(NULL,10) / 1024 / 1024 )+ " MB / "+QString::number( t.at(0).toInt(NULL,10) / 1024 / 1024 ) + " MB";
           ssSize = t.at(0).toInt(NULL,10) - t.at(1).toInt(NULL,10);
@@ -287,15 +294,16 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
     if( tbitem.Progress == "0" ){
 
         SetItemData( row, 1,  "");
+
     }else{
 
         OutProgress = RestTime +"    "+ tbitem.Progress + " %";
 
         int w =  this->columnWidth( 1 );
-        int O = OutProgress.length() * 12 - 20;
+        int O = OutProgress.length() * 12 - 40;
         if ( w < O ){
 
-            this->setColumnWidth(  1,O );
+           // this->setColumnWidth(  1,O );
         }
         SetItemData( row, 1, OutProgress );
     }
@@ -317,11 +325,11 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
         QString RTime = SDTime( rt );
 
         SetItemData( row, 3,  RTime );
+
     }else{
+
         //SetItemData( row, 3,  RestTime );
     }
-
-
 
 
  /**
@@ -388,6 +396,7 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
     this->setColumnHidden( 8,true );
 
     //this->setRowHeight( row, 25   );
+    this->horizontalScrollBar()->setVisible( false );
 }
 
 void DownListView::SetItemData( int row,int col,QString vStr  ){

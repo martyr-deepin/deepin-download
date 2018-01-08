@@ -39,8 +39,8 @@ QTableView::item:selected {
 }
 
 QHeaderView::section {
-    /*color: white;*/
 
+    /*color: white;*/
     background-color: rgb(255,255,255);
     border: 0px solid #FFFFFF;
     border-radius:0px;
@@ -48,11 +48,11 @@ QHeaderView::section {
 
     font-style:normal;
     font-weight:normal;
-
 }
 
 
 QToolBar {
+
     /*background-color: #222222;*/
     border: none;
     padding: 1px;
@@ -76,16 +76,18 @@ QToolBar::separator {
 
 
 QToolButton {
-    border: 1px /*solid #222222*/;
+    border: 0px /*solid #222222*/;
     margin: 1px;
-    width:32px;
-    height:32px;
+
 }
 
 QToolButton::hover {
-    background-color: #f2f0f5;
-    border: 1px /*solid #222222*/;
+
+    border: 0px;
+    background: #2ca7f8;
+    border-radius:3px;
 }
+
 
 QToolButton[popupMode="1"] {
 /*

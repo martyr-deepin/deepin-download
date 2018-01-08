@@ -13,17 +13,24 @@ GCToolTips::GCToolTips(QWidget *parent) : QDialog(parent){
     //button1   = new QPushButton;
     outLabel1 = new QLabel;
 
-    QVBoxLayout *xx = new QVBoxLayout;
+    QHBoxLayout *xx = new QHBoxLayout;
+
     xx->addWidget( outLabel1 );
-    //xx->addWidget( button1 );
 
     this->setLayout( xx );
-    this->setFixedSize( 350,100 );
-    this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-    this->setStyleSheet("QDialog{border:2px solid green;}");
+    this->setFixedSize( 350,80 );
+
+    //this->setWindowFlags( Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
+    //this->setAttribute( Qt::WA_TranslucentBackground ,true );
+    //this->setStyleSheet( "QWidget{background-color:#101010;}" );
+
+    //QPalette pa;
+    //pa.setColor(QPalette::WindowText,Qt::red);
+    //outLabel1->setPalette(pa);
+
+    this->close();
 
     m_pCloseTimer = new QTimer(this);
-
     connect( m_pCloseTimer, SIGNAL( timeout() ), this, SLOT( HideMessageBox() ));
 
 }
@@ -34,25 +41,20 @@ GCToolTips::~GCToolTips(){
 
 void GCToolTips::ShowMessage( QString text ){
 
-    this->hide();
+    this->close();
 
+    m_pCloseTimer->start( 2000 );
     outLabel1->setText( text );
-    this->show();
 
-    QRect rect = QApplication::desktop()->availableGeometry();
-    m_point.setX(rect.width() - width());
-    m_point.setY(rect.height() - height());
-    move( m_point.x(), m_point.y() );
+    this->exec();
 
-    m_pCloseTimer->start( 5000 );
 
 }
 
 void GCToolTips::HideMessageBox(){
 
     m_pCloseTimer->stop();
-
-    this->hide();
+    this->close();
 }
 
 

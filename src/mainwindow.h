@@ -130,6 +130,8 @@ private:
     GCSystemTrayIcon *systemTrayIcon;   //状态栏（托盘 ）
     GCStatusBar      *statusBar;
     //QMenu            *m_ContextMenu;
+    GCToolTips       *toolTips;
+
     Dtk::Widget::DWaterProgress *waterProgress;
 
     void LoadTableView( QWidget *centerWidget );
@@ -183,11 +185,12 @@ private:
     QHBoxLayout *layout;
 
     SlideBar *slidebar;
-    ToolBar  *toolbar;
+
     QLabel   *bottomlabel;
 
 
 public:
+    ToolBar  *toolbar;
     void SetBottomStatusText( QString text );
     void ShowMessageTip( QString text );
 

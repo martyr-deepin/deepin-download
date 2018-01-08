@@ -21,6 +21,8 @@ ToolBar::ToolBar(QWidget *parent) : QWidget(parent)
     
     tBtn1 = new QAction(QIcon(":Resources/images/task_new_normal.svg"), "", parent );
     tBtn1->setData( "1" );
+
+
 /**
     QAction *tBtn2 = new QAction(QIcon(":Resources/images/task_new_normal.svg"), "", parent );
     tBtn2->setData( "2" );

@@ -189,6 +189,9 @@ bool NewDown::checkDir( QString path ){
 
 void NewDown::buttonClicked(int index, const QString &text){
 
+
+
+
     qDebug() << index;
 
     if( index == 1 ){
@@ -200,6 +203,7 @@ void NewDown::buttonClicked(int index, const QString &text){
 
         close();
     }else{
+
 
        Button1Click();
        close();
@@ -314,6 +318,8 @@ int NewDown::Button2Click(){
 void NewDown::ClearEdit(){
 
     this->Edit1->setText("");
+    msg->setText("");
+    errormsg->setText("");
 }
 
 

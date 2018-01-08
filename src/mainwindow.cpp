@@ -111,11 +111,14 @@ void MainWindow::initMainWindow(){
     layout = new QHBoxLayout();
 
     slidebar = new SlideBar();        //左侧边
-    centerWidget = new QWidget;       //中部容器（ 表格 ）
-    LoadTableView( centerWidget );    //中部主体表格
+    //centerWidget = new QWidget;       //中部容器（ 表格 ）
 
+    downListView = new DownListView( this,this );
+    LoadTableView( this /*centerWidget*/ );    //中部主体表格
     layout->addWidget(slidebar);
-    layout->addWidget(centerWidget );
+    layout->addWidget( downListView /*centerWidget*/ );
+
+    layout->setContentsMargins( 0,0,0,0);
 
     toolbar = new ToolBar();          //工具栏
     this->titlebar()->setCustomWidget(toolbar, Qt::AlignVCenter, false);
@@ -146,6 +149,7 @@ void MainWindow::initMainWindow(){
     /** 浮窗 */
     //mwm  = new MWM( this );
     //mwm->ShowMWM();
+    toolTips = new GCToolTips( this );
 
     /** 启用文件拖入支持 */
     this->setAcceptDrops( true );
@@ -231,6 +235,8 @@ void MainWindow::initMainWindow(){
    /** 默认切换到全部任务 */
    slidebar->SetSelectRow( 5 );
    slidebar->SetSelectRow( 0 );
+
+   this->setMinimumWidth( 1024 );
 
 }
 
@@ -393,8 +399,11 @@ void MainWindow::SelToolItem( int btn ){
     switch ( btn  ) {
         case 1:  // 普通URI 下载
 
-            newDownDlg->ClearEdit();
-            newDownDlg->exec();
+            toolbar->toolsG->widgetForAction( toolbar->tBtn1 )->setAttribute(Qt::WA_UnderMouse, false);
+            QTimer::singleShot(1, [ = ]() {
+                newDownDlg->ClearEdit();
+                newDownDlg->exec();
+            });
 
             break;
         case 2:  // BT 种子文件
@@ -515,7 +524,7 @@ void MainWindow::SelSlideItem( int row ){
 
 void MainWindow::SetBottomStatusText( QString text ){
 
-
+    bottomlabel->setStyleSheet( "color:##fffffb;" );
     bottomlabel->setText(  text  );
 }
 
@@ -631,7 +640,7 @@ void MainWindow::LoadTrayIcon(){
 */
 void MainWindow::LoadTableView( QWidget *centerWidget ){
 
-    downListView =  new DownListView( this,this  /*centerWidget*/ );
+    //downListView =  new DownListView( this,this  /*centerWidget*/ );
 
     waterProgress = new Dtk::Widget::DWaterProgress( centerWidget );
     waterProgress->setFixedSize(60, 60);
@@ -639,12 +648,12 @@ void MainWindow::LoadTableView( QWidget *centerWidget ){
     Dtk::Widget::moveToCenter( waterProgress );
 
     //m_ContextMenu = new QMenu;
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget( downListView );
+    //QVBoxLayout *layout = new QVBoxLayout;
+    //layout->setContentsMargins(0, 0, 0, 0);
+    //layout->addWidget( downListView );
     //layout->addWidget( waterProgress/*, 0, Qt::AlignCenter*/);
 
-    centerWidget->setLayout( layout );
+    //centerWidget->setLayout( layout );
 
 
     //waterProgress->move(( this->width() - 60)/2,( this->height() -60)/2);
@@ -1838,6 +1847,7 @@ void MainWindow::SearchChang( QString  text ) {
     qDebug() << "MainWindow::SearchChang " << text;
 
 
+    bool find = false;
     for( int i = 0 ; i < downListView->m_dataModel->rowCount() ; i++  ){
 
         QStandardItemModel *mdb = downListView->m_dataModel;
@@ -1847,8 +1857,16 @@ void MainWindow::SearchChang( QString  text ) {
         if( filename.indexOf(  text ) >= 0 ){
 
             downListView->selectRow( i );
+            find = true;
         }
     }
+
+    if( !find ){
+
+        toolTips->ShowMessage( tr("No results") );
+    }
+
+    toolbar->searchedit->setText("");
 
 }
 
@@ -2119,13 +2137,26 @@ void MainWindow::ShowContextMenu( const QPoint &point ){
 //////////////////////////////////////////////////////////////////////////////////
 
 void MainWindow::resizeEvent(QResizeEvent* event){
-/**
+
     qDebug() <<"MMM "<<event->size();
-    qDebug() <<"centerWidget " << centerWidget->size();
-    qDebug() <<"downListView " << downListView->size();
-**/
-    int ww = downListView->size().width();
-    downListView->SetTableWidth( ww );
+    //qDebug() <<"centerWidget " << centerWidget->size();
+    //qDebug() <<"downListView " << downListView->size();
+
+
+
+    if( this->width() < 1024 ){
+
+        qDebug() <<"this->width() "<< this->width();
+        //this->setMinimumWidth( 1024 );
+        event->ignore();
+        return;
+
+    }else{
+
+        int ww = downListView->size().width();
+        downListView->SetTableWidth( ww );
+
+    }
 
     /** qDebug() <<"downListView " << downListView->size(); */
 }

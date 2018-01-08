@@ -23,7 +23,7 @@ private slots:
     void HideMessageBox();
 
 private:
-    QPoint   m_point;
+   QPoint   m_point;
 
 private:
    QLabel         *outLabel1;
