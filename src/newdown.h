@@ -30,6 +30,7 @@ private:
     QLabel      *msg;
     QComboBox   *selSavePath;
     QString     GetThunderUrl(  QString thunder_url );
+    bool        existUrl(const QString &strText);
     int         dtype = 0;
     QString     dPath = "";
     QString     SavePath = "";

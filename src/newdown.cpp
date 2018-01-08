@@ -279,9 +279,18 @@ int NewDown::Button2Click(){
                 return -1;
               }
 
-              if ( url.trimmed() != "" ){
+              if ( url.trimmed() != ""  ){
 
-                  mainUI->AppendDownUrl( url ,this->SavePath );
+                  if ( existUrl( url.trimmed() ) ){
+
+                      mainUI->AppendDownUrl( url ,this->SavePath );
+                  }else{
+
+                      this->errormsg->setText( tr("The address cannot be analyzed, please retry!") );
+                      return -1;
+                  }
+
+
               }
           }
        }
@@ -375,8 +384,23 @@ QString NewDown::GetThunderUrl(  QString thunder_url ){
 }
 
 
+bool NewDown::existUrl(const QString &strText)
+{
+    bool bResult = false;
+    QString strTempText = strText;
+    QString strUrlExp = "((http|https|ftp)://|(www)\\.)(\\w+)(\\.?[\\.a-z0-9/:?%&=\\-_+#;]*)"; //url正则
+    QRegExp urlRegExp(strUrlExp,Qt::CaseInsensitive); //Url正则表达式，不区分大小写
+    while(urlRegExp.indexIn(strTempText) != -1)
+    {
+        bResult = true;
+        QString strWebUrl = urlRegExp.cap(0);//匹配到的url
 
-
+        qDebug() << strWebUrl; //输出url
+        int nIndex = strTempText.indexOf(strWebUrl); //索引位置
+        strTempText.remove(0,nIndex+strWebUrl.size()); //删除已遍历过的内容
+    }
+    return bResult; //返回是否包含url
+}
 
 
 

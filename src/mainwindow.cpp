@@ -393,6 +393,7 @@ void MainWindow::SelToolItem( int btn ){
     switch ( btn  ) {
         case 1:  // 普通URI 下载
 
+            newDownDlg->ClearEdit();
             newDownDlg->exec();
 
             break;
