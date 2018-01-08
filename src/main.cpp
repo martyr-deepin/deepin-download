@@ -76,17 +76,24 @@ int main(int argc, char *argv[])
     /**
     * 单例测试
     **/
-
-    if (!app.setSingleInstance("deepin-download")) {
+    if ( !app.setSingleInstance("deepin-download") ) {
 
          qDebug() << "there's an deepin-download instance running.";
+
+
 
          QDBusInterface *iface = new QDBusInterface( "com.deepin.Download",
                                  "/com/deepin/Download",
                                  "com.deepin.Download", QDBusConnection::sessionBus());
 
          auto reply =  iface->call("ShowDownWindow", fileURL );
+
          return 0;
+
+    }else{
+
+
+
     }
 
     /**

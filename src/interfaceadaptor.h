@@ -11,7 +11,7 @@ class InterfaceAdaptor : public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Interface", "com.deepin.Download")
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"com.deepin.Download\">\n"
-"    <method name=\"RaiseWindow\"/>\n"
+"    <method name=\"ShowDownWindow\"/>\n"
 "  </interface>\n"
         "")
 public:

@@ -2238,7 +2238,8 @@ int MainWindow::initAria2cWork(){
 
         qDebug() << "发起进程" << ps->error() ;
 
-        ShowMessageTip(  "发起进程 ariar2c 进程中." + ps->error() );
+        /**  不提示用户*/
+        //ShowMessageTip(  "发起进程 ariar2c 进程中." + ps->error() );
 
      }
 

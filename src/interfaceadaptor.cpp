@@ -19,7 +19,16 @@ void InterfaceAdaptor::ShowDownWindow(  QString fileURL ){
     mainUI->activateWindow();
     mainUI->raise();
 
-    mainUI->OPenDownUrlDlg( fileURL );
+
+    if( fileURL != "" ){
+
+
+      mainUI->OPenDownUrlDlg( fileURL );
+
+    }else{
+
+
+    }
 
     //qDebug() << "ShowDownWindow " << fileURL;
 }
