@@ -19,7 +19,7 @@ private:
 
 
 public:
-    CloseWindowMsgBox();
+    CloseWindowMsgBox( QWidget *parent = 0);
     QRadioButton *sel1;
     QRadioButton *sel2;
     QCheckBox    *checkBox;

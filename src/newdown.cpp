@@ -91,7 +91,7 @@ NewDown::NewDown( MainWindow *mainUI ,QWidget *parent) :Dtk::Widget::DDialog(par
     setOnButtonClickedClose( false );
 
     this->setFixedSize( 540,400 );
-    setWindowFlags( /**Qt::FramelessWindowHint  | */ Qt::WindowStaysOnTopHint );
+    //setWindowFlags( /**Qt::FramelessWindowHint  | */ Qt::WindowStaysOnTopHint );
 
     connect( this, &Dtk::Widget::DDialog::buttonClicked,this,&NewDown::buttonClicked );
     //connect( button1, &QPushButton::clicked,this,&NewDown::Button1Click );

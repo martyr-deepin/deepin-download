@@ -1,4 +1,4 @@
-#include "downlistview.h"
+﻿#include "downlistview.h"
 #include <QHeaderView>
 #include <QScrollBar>
 
@@ -16,7 +16,7 @@ DownListView::DownListView( MainWindow *mainUI, QWidget *parent): QTableView( pa
 
     QStringList tbHeader;
     //tbHeader << "文件名" << "大小和进度" << "速度" << "剩余" << "状态" << "gid";
-    tbHeader << tr("File name") << tr("Size") << tr("Speed") << tr("Remaining time") << tr("Status") << "gid" << "status" << "";
+    tbHeader << tr("File name") << tr("Size") << tr("Speed") << tr("Remaining time") << tr("Status") << "gid" << "status" << "dtime" <<"progress";
 
     QList<TBItem> tbList;
 
@@ -122,26 +122,28 @@ void DownListView::initTable( QStringList tbHeader ,QList<TBItem> tbList ){
    this->setModel(  m_dataModel );
 
    /** 列宽自适应大小 */
-   //this->horizontalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
+//this->horizontalHeader()->setSectionResizeMode( QHeaderView::ResizeToContents );
 //   QFont hfont;
 //   hfont.setBold(false);
 //   hfont.setStyleName("Normal");
 //   hfont.setWeight(1);
 //   this->horizontalHeader()->setFont( hfont );
 
-
+  //verticalHeader()->setDefaultSectionSize(15);
 
 
    /** 初始列宽定义 */
    this->setColumnWidth( 0 ,300 );
-   this->setColumnWidth( 1 ,100 );
+   this->setColumnWidth( 1 ,300 );
    this->setColumnWidth( 2 ,100 );
    this->setColumnWidth( 3 ,100 );
    this->setColumnWidth( 4 ,100 );
 
-   //this->setColumnHidden( 4,true );
-   this->setColumnHidden( 5,true );
-   this->setColumnHidden( 6,true );
+
+
+   //this->setColumnHidden( 5,true );
+   //this->setColumnHidden( 6,true );
+   //this->setColumnHidden( 7,true );
 
 
    /** 代理 进度条 */
@@ -167,12 +169,12 @@ void DownListView::SetTableWidth( int MainWidth ){
 
     //qDebug() << "new Width " << z0;
 
-    if ( MainWidth >= 1000 ){
+    if ( MainWidth >= 1024 ){
 
         int z0 = MainWidth * 0.30;
-        int z1 = MainWidth * 0.10;
+        int z1 = MainWidth * 0.25;
         int z2 = MainWidth * 0.10;
-        int z3 = MainWidth * 0.10;
+        int z3 = MainWidth * 0.5;
         int z4 = MainWidth - z0 - z1 - z3;
 
 
@@ -260,6 +262,9 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
 
     }
 
+    qDebug() << "filename: " << filename;
+    SetItemData( row, 0,  filename );
+
     int speedInt = 0;
     QString Speed = "";
     if( tbitem.Speed.toInt(NULL,10) > 0 ){
@@ -267,53 +272,57 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
        speedInt = tbitem.Speed.toInt(NULL,10);
     }
 
-
-
     QString RestTime = "";
+    int ssSize = 0;
     if( tbitem.RestTime.split("|").size() == 2   ){
 
         QStringList t = tbitem.RestTime.split("|");
         if(  t.at(1).toInt(NULL,10) >0  && t.at(0).toInt(NULL,10) >0 ){
           RestTime = QString::number( t.at(1).toInt(NULL,10) / 1024 / 1024 )+ " MB / "+QString::number( t.at(0).toInt(NULL,10) / 1024 / 1024 ) + " MB";
-
-          int t0 = t.at(0).toInt(NULL,10);
-          int t1 = t.at(1).toInt(NULL,10);
-          /**
-           * 计算时间
-           */
-           //17.8G×1024×1024÷300＝***秒
-          int bCountSize =  t0 - t1 ;
-          bCountSize = bCountSize * 1024 * 1024;
-          if ( bCountSize > 0 && speedInt >0 ){
-
-              int testTime =  bCountSize / speedInt;
-              qDebug() << "testTime "<< testTime;
-
-              //int minutes = testTime % 3600 / 60;
-              RestTime = QString::number( testTime ) + " time";
-
-
-          }
-
-
+          ssSize = t.at(0).toInt(NULL,10) - t.at(1).toInt(NULL,10);
         }
     }
 
-
-    qDebug() << "filename: " << filename;
-
-    SetItemData( row, 0,  filename );
+    QString OutProgress = "";
     if( tbitem.Progress == "0" ){
 
         SetItemData( row, 1,  "");
     }else{
 
-        SetItemData( row, 1,  tbitem.Progress + " %");
+        OutProgress = RestTime +"    "+ tbitem.Progress + " %";
+
+        int w =  this->columnWidth( 1 );
+        int O = OutProgress.length() * 12 - 20;
+        if ( w < O ){
+
+            this->setColumnWidth(  1,O );
+        }
+        SetItemData( row, 1, OutProgress );
     }
 
 
     SetItemData( row, 2,  Speed );
-    SetItemData( row, 3,  RestTime );
+
+    //qDebug() << "ssSize " << ssSize;
+    //qDebug() << "speed " << speedInt;
+    if( ssSize >0 && speedInt >0  ){
+
+        //ssSize =  ssSize / 1024 / 1024 ;
+        //speedInt = speedInt /1024;
+        int rt = ssSize / speedInt;
+
+        //qDebug()<< "RTime: " << rt;
+        //qDebug()<< "RTime: " << SDTime( rt );
+
+        QString RTime = SDTime( rt );
+
+        SetItemData( row, 3,  RTime );
+    }else{
+        //SetItemData( row, 3,  RestTime );
+    }
+
+
+
 
  /**
     文案：
@@ -365,13 +374,20 @@ void DownListView::SetItemData( int row ,TBItem tbitem  ){
     SetItemData( row, 5,  tbitem.gid );
     SetItemData( row, 6,  tbitem.State );
 
+    SetItemData( row, 7,  tbitem.dtime );
+    SetItemData( row, 8,  tbitem.Progress );
 
     m_dataModel->item( row , 1 )->setTextAlignment(Qt::AlignCenter);
     //m_dataModel->item( row , 2 )->setTextAlignment(Qt::AlignCenter);
     //m_dataModel->item( row , 3 )->setTextAlignment(Qt::AlignCenter);
     //m_dataModel->item( row , 4 )->setTextAlignment(Qt::AlignCenter);
+
     this->setColumnHidden( 5,true );
     this->setColumnHidden( 6,true );
+    this->setColumnHidden( 7,true );
+    this->setColumnHidden( 8,true );
+
+    //this->setRowHeight( row, 25   );
 }
 
 void DownListView::SetItemData( int row,int col,QString vStr  ){
@@ -551,6 +567,44 @@ void DownListView::view_sort(int column) {
 
 }
 
+QString DownListView::SDTime( int sec ) {
+
+       int day = 0;
+       int hour = 0;
+       int min = 0;
+/**
+       hour = sec / 3600;
+
+       if( hour > 24) {
+
+           day = hour / 24;
+           hour =( sec /  3600 ) % 24 % 60;
+           min = ( sec %  3600 ) / 60;
+           sec = ( sec %  3600 ) % 60;
+
+       }else{*/
+
+           hour = sec / 3600;
+           min = ( sec %  3600 ) / 60;
+           sec = ( sec %  3600 ) % 60;
+/*
+       }
+*/
+       //printf("%d D %d H:%d M:%d S\n",day,hour,min,sec );
+       QString rtStr;
+       //rtStr = QString("%1 %2 %3 %4").arg( day ).arg( hour ).arg( min ).arg( sec );
+
+       rtStr = QString("%1:%2:%3").arg( hour ).arg( min ).arg( sec );
+
+       char buffer[20];
+       memset( buffer,0, sizeof(buffer)*sizeof(char));
+       sprintf( buffer, "%.2d:%.2d:%.2d",hour,min,sec);
+       QString Z = QString(QLatin1String(buffer));
+
+
+       return Z;//rtStr;
+
+}
 
 /**
 * 进度条 处理
@@ -563,6 +617,7 @@ ProgressBarDelegate::ProgressBarDelegate(QObject *parent) :QStyledItemDelegate(p
 
 void ProgressBarDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const{
 
+
         QStyleOptionViewItem viewOption(option);
 
         initStyleOption(&viewOption, index);
@@ -573,21 +628,25 @@ void ProgressBarDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 
         QStyledItemDelegate::paint( painter, viewOption, index );
 
+
+
         if ( index.column() == 1 ){
 
-            //int nProgress = index.model()->data( index,Qt::DisplayRole ).toInt();
 
-            int nProgress = index.model()->data( index ).toString().replace("%","").trimmed().toInt(NULL);
+            //int nProgress = index.model()->data( index,Qt::DisplayRole ).toInt();
+            int nProgress = index.sibling( index.row(),8 ).data().toInt();
+
+            //int nProgress = index.model()->data( index ).toString().replace("%","").trimmed().toInt(NULL);
             int nLeft = 0;
-            int nTop = 18;
+            int nTop = 28;
             int nWidth = option.rect.width() - 2 * nLeft;
-            int nHeight = option.rect.height() - 2  * nTop;
+            int nHeight = 2;//option.rect.height() - 2  * nTop;
 
             // 设置进度条的风格
             QStyleOptionProgressBar *progressBarOption = new QStyleOptionProgressBar;
             progressBarOption->initFrom(option.widget);
             // 设置进度条显示的区域
-            progressBarOption->rect = QRect( option.rect.left() + nLeft, option.rect.top() + nTop+12,  nWidth, nHeight);
+            progressBarOption->rect = QRect( option.rect.left() + nLeft, option.rect.top() + nTop ,  nWidth, nHeight);
             // 设置最小值
             progressBarOption->minimum = 0;
             // 设置最大值
@@ -605,7 +664,7 @@ void ProgressBarDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
             //绘制进度条
             //CE_ProgressBarGroove,
             //CE_ProgressBarContents,
-            DApplication::style()->drawControl(QStyle::CE_ProgressBarContents, progressBarOption, painter, progressBar);
+            DApplication::style()->drawControl( QStyle::CE_ProgressBarContents, progressBarOption, painter, progressBar );
 
         }else{
             //否则调用默认委托

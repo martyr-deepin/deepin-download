@@ -36,6 +36,8 @@
 
 #include <QSettings>
 
+#include <QBitArray>
+
 #include "sqlitefunt.h"
 #include "interfaceadaptor.h"
 #include "gcmessagebox.h"
@@ -47,6 +49,7 @@
 
 #include <QScreen>
 #include "dtkwidget_global.h"
+#include "dwidgetutil.h"
 
 #define  SLEEPSS          2000
 #define  TDSTATUS         6
@@ -132,7 +135,7 @@ void MainWindow::initMainWindow(){
     LoadTrayIcon();                 //系统托盘图标及菜单
 
     /** 下载对话框 （ uri ）*/
-    newDownDlg =  new NewDown( this );
+    newDownDlg =  new NewDown( this,this);
 
     /** 选项配置 */
     configDlg  =   new ConfigDlg;
@@ -275,13 +278,16 @@ void MainWindow::closeEvent(QCloseEvent *event){
     configIniRead->setIniCodec("UTF8");
     int ExitModel = configIniRead->value("/Config/ExitModel",0).toInt();
     int ShowMM = configIniRead->value("/Config/ShowMM",1).toInt();
-
     delete configIniRead;
+
+    closeSaveSetup();
 
     if ( ShowMM != 1 ){ //无提示
 
         if ( ExitModel == 0 ){
-          //直接退出
+
+
+            //直接退出
             CloseAllWindow();
             event->accept();
 
@@ -296,7 +302,7 @@ void MainWindow::closeEvent(QCloseEvent *event){
     }
 
     //有提示....
-    CloseWindowMsgBox *closewindowBox = new CloseWindowMsgBox;
+    CloseWindowMsgBox *closewindowBox = new CloseWindowMsgBox( this );
     int index = closewindowBox->exec();
     if( index == 1 ){
 
@@ -340,12 +346,55 @@ void MainWindow::closeEvent(QCloseEvent *event){
 
 }
 
+void MainWindow::ShowMW(){
+
+   QSettings *configIniRead = new QSettings( CacheDir + "/setup.ini", QSettings::IniFormat);
+   configIniRead->setIniCodec("UTF8");
+   QByteArray geometry = configIniRead->value("/WindowInfo/Geometry" ).toByteArray();
+
+   delete configIniRead;
+
+   if ( !geometry.isEmpty()   ) {
+
+       restoreGeometry( geometry);
+
+
+   }else{
+
+       QScreen *screen = QGuiApplication::primaryScreen();
+       QRect  screenGeometry = screen->geometry();
+       setMinimumSize(QSize(screenGeometry.width() * 1 / 2, screenGeometry.height() * 1 / 2));
+       Dtk::Widget::moveToCenter( this );
+   }
+
+   this->show();
+
+   Dtk::Widget::moveToCenter( this );
+
+
+   int ww = downListView->size().width();
+   downListView->SetTableWidth( ww );
+
+}
+
+void MainWindow::closeSaveSetup(){
+
+    //saveGeometry();
+    //"/WindowInfo/Geometry"
+    QSettings *configIniWrite = new QSettings(CacheDir + "/setup.ini", QSettings::IniFormat);
+    configIniWrite->setIniCodec("UTF8");
+    configIniWrite->setValue("/WindowInfo/Geometry", saveGeometry() );
+
+    delete configIniWrite;
+}
+
 void MainWindow::SelToolItem( int btn ){
 
     switch ( btn  ) {
         case 1:  // 普通URI 下载
 
             newDownDlg->exec();
+
             break;
         case 2:  // BT 种子文件
             AddBtFile();
@@ -501,7 +550,7 @@ void MainWindow::SeeBoard(){
 
         if ( ! downDB->findATaskI( durllist.at(i) )  &&  ! newDownDlg->isVisible()  ){
             newDownDlg->SetDownloadEdit( durllist.at(i) );
-            newDownDlg->show();
+            newDownDlg->exec();
         }
     }
 
@@ -581,18 +630,20 @@ void MainWindow::LoadTrayIcon(){
 */
 void MainWindow::LoadTableView( QWidget *centerWidget ){
 
-    downListView =  new DownListView( this,centerWidget );
-    waterProgress = new Dtk::Widget::DWaterProgress;
-    waterProgress->setFixedSize(50, 50);
+    downListView =  new DownListView( this,this  /*centerWidget*/ );
+    waterProgress = new Dtk::Widget::DWaterProgress( centerWidget );
+    waterProgress->setFixedSize(60, 60);
     waterProgress->setVisible( false );
 
     //m_ContextMenu = new QMenu;
     QVBoxLayout *layout = new QVBoxLayout;    
     layout->addWidget( downListView );
-    layout->addWidget( waterProgress, 0, Qt::AlignCenter);
+    //layout->addWidget( waterProgress/*, 0, Qt::AlignCenter*/);
 
-    //layout->setContentsMargins(0,0,0,0);
     centerWidget->setLayout( layout );
+
+    Dtk::Widget::moveToCenter( waterProgress );
+    //waterProgress->move(( this->width() - 60)/2,( this->height() -60)/2);
 
     //selected = downListView->selectionModel()->selectedRows();
     connect( downListView, &QTableView::clicked,this, [=](QModelIndex modelIndex ){
@@ -1430,6 +1481,8 @@ void MainWindow::OnNetworkReplyNode( TBItem* tbitem ){
         }
     }
 
+
+
 }
 
 /**
@@ -1711,7 +1764,7 @@ void MainWindow::OPenDownUrlDlg( QString DownFileUrl ){
     if ( DownFileUrl != "" ){
 
         newDownDlg->SetDownloadEdit( DownFileUrl );
-        newDownDlg->show();
+        newDownDlg->exec();
     }
 }
 
@@ -1720,7 +1773,7 @@ void MainWindow::StartRun( QString DownFileUrl ){
     if ( DownFileUrl != "" ){
 
         newDownDlg->SetDownloadEdit( DownFileUrl );
-        newDownDlg->show();
+        newDownDlg->exec();
     }
 
     QMainWindow::show();

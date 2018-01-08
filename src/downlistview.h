@@ -63,6 +63,7 @@ protected:
 
 private:
 
+    QString SDTime( int sec );
     void initTable(  QStringList tbHeader ,QList<TBItem> tbList  );
 
 signals:

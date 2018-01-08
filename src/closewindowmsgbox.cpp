@@ -6,8 +6,7 @@
 
 #include <QDebug>
 
-CloseWindowMsgBox::CloseWindowMsgBox()
-{
+CloseWindowMsgBox::CloseWindowMsgBox( QWidget *parent ):Dtk::Widget::DDialog(parent){
 
     //QString titleStr = tr("Please select your operation");
 
@@ -33,7 +32,7 @@ CloseWindowMsgBox::CloseWindowMsgBox()
     addButton(tr("Cancel"), false);
     addButton(tr("OK"), true, DDialog::ButtonRecommend);
 
-    setWindowFlags( /**Qt::FramelessWindowHint  | */ Qt::WindowStaysOnTopHint );
+    //setWindowFlags( /**Qt::FramelessWindowHint  | */ Qt::WindowStaysOnTopHint );
 
     connect( this,&Dtk::Widget::DDialog::buttonClicked,this,&CloseWindowMsgBox::buttonClicked );
 

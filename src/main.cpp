@@ -110,12 +110,12 @@ int main(int argc, char *argv[])
 
     Utils::applyQss(&window, "main.qss");
 
-    QScreen *screen = QGuiApplication::primaryScreen();
-    QRect  screenGeometry = screen->geometry();
-    window.setMinimumSize(QSize(screenGeometry.width() * 1 / 2, screenGeometry.height() * 1 / 2));
-    Dtk::Widget::moveToCenter(&window);
+//    QScreen *screen = QGuiApplication::primaryScreen();
+//    QRect  screenGeometry = screen->geometry();
+//    window.setMinimumSize(QSize(screenGeometry.width() * 1 / 2, screenGeometry.height() * 1 / 2));
+//    Dtk::Widget::moveToCenter(&window);
 
-    window.show();
+    window.ShowMW();
 
     /**
      * 注册DBUS 服务&对象，

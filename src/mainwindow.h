@@ -80,7 +80,7 @@ public:
     //QSize sizeHint() const;
     //void keyPressEvent(QKeyEvent *keyEvent);
     //void resizeEvent(QResizeEvent* event);
-
+    void ShowMW();
 public:
     SQLiteFunt      *downDB;
     Aria2cRPCMsg    *aria2c;    
@@ -95,6 +95,7 @@ protected:
     void dropEvent( QDropEvent *e );
     void closeEvent( QCloseEvent *event );
     void resizeEvent(QResizeEvent* event);
+
 
     void slotActionInvoked(uint id, QString action );
     void notifyActivator( QString title ,QString text  );
@@ -139,6 +140,7 @@ private:
 
     void LoadDownList();
     void CloseAllWindow();
+    void closeSaveSetup();
 
     QList<QString> FindDownloadUrl( const QString &strText );
 
