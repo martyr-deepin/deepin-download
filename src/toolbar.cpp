@@ -11,13 +11,13 @@
 
 ToolBar::ToolBar(QWidget *parent) : QWidget(parent)
 {
+
     this->setFixedHeight(24);
-    
     layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     
     QSvgWidget *icon = new QSvgWidget(QString(":Resources/images/logo_24.svg"));
-    icon->setFixedSize(24, 24);
+    //icon->setFixedSize(24, 24);
     
     tBtn1 = new QAction(QIcon(":Resources/images/task_new_normal.svg"), "", parent );
     tBtn1->setData( "1" );

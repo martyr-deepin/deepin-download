@@ -62,7 +62,7 @@ GCSystemTrayIcon::GCSystemTrayIcon( QObject *parent ):QSystemTrayIcon( parent ){
     this->setContextMenu(m_menu);
 
     //新建托盘要显示的icon
-    this->setIcon( QIcon(":Resources/images/logo@2x.png") );
+    this->setIcon( QIcon(":Resources/images/deepin-download-symbolic.svg") );
     this->setToolTip( tr("Deepin Downloader") );
     this->show();    
 

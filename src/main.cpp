@@ -98,11 +98,22 @@ int main(int argc, char *argv[])
                                                     );
 
     const QString acknowledgementLink = "https://www.deepin.org/acknowledgments/deepin-download";
-    app.setProductIcon(QPixmap::fromImage(QImage(Utils::getQrcPath("logo_24.svg"))));
+
+    QIcon appico = QIcon::fromTheme("deepin-download");
+
+    if( appico.isNull() ){
+
+
+        appico = QIcon(":Resources/images/logo_24.svg");
+    }
+
+    //app.setProductIcon(QPixmap::fromImage(QImage(Utils::getQrcPath("logo_24.svg"))));
+    app.setProductIcon( appico );
+    app.setWindowIcon( appico );
     app.setProductName(DApplication::translate("MainWindow", "Deepin Downloader"));
     app.setApplicationDescription(DApplication::translate("MainWindow", descriptionText) + "\n");
     app.setApplicationAcknowledgementPage(acknowledgementLink);
-    app.setWindowIcon(QIcon(Utils::getQrcPath("logo_24.svg")));
+
 
     /**
      */

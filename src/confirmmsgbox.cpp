@@ -14,7 +14,18 @@ ConfirmMsgBox::ConfirmMsgBox( QWidget *parent ,QString title , QString text )
 
     tip = tr( text.toStdString().data() );
 
-    setIcon( QIcon(":Resources/images/logo_24.svg") );
+    //setIcon( QIcon(":Resources/images/logo_24.svg") );
+
+    QIcon appico = QIcon::fromTheme("deepin-download");
+
+    if( ! appico.isNull() ){
+
+        setIcon( appico );
+    }else{
+
+        setIcon( QIcon(":Resources/images/logo_24.svg") );
+    }
+
     setTitle( titleStr );
 
     QLabel* label = new QLabel(this);

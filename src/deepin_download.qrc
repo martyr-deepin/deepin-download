@@ -51,5 +51,6 @@
         <file>Resources/images/folder-downloads.svg</file>
         <file>Resources/images/folder-desktop.svg</file>
         <file>Resources/images/torrent.svg</file>
+        <file>Resources/images/deepin-download-symbolic.svg</file>
     </qresource>
 </RCC>

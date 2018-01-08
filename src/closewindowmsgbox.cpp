@@ -11,7 +11,17 @@ CloseWindowMsgBox::CloseWindowMsgBox( QWidget *parent ):Dtk::Widget::DDialog(par
     //QString titleStr = tr("Please select your operation");
 
 
-    setIcon( QIcon(":Resources/images/logo_24.svg") );
+    //setIcon( QIcon(":Resources/images/logo_24.svg") );
+    QIcon appico = QIcon::fromTheme("deepin-download");
+
+    if( ! appico.isNull() ){
+
+        setIcon( appico );
+    }else{
+
+        setIcon( QIcon(":Resources/images/logo_24.svg") );
+    }
+
     setTitle( tr("Please select your operation") ); //请选择您的操作
 
     sel1 =  new QRadioButton;

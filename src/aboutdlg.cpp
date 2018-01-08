@@ -16,7 +16,10 @@ AboutDlg::AboutDlg(QWidget *parent) : QDialog(parent){
 
    QWidget *IL = new QWidget;
    QVBoxLayout *xBox = new QVBoxLayout;   
+
    QSvgWidget *logo = new QSvgWidget(QString(":Resources/images/logo_24.svg"));
+
+
    logo->setFixedSize( 128,128 );
    xBox->addWidget( logo );
    IL->setLayout( xBox );
