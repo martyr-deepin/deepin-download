@@ -631,21 +631,24 @@ void MainWindow::LoadTrayIcon(){
 void MainWindow::LoadTableView( QWidget *centerWidget ){
 
     downListView =  new DownListView( this,this  /*centerWidget*/ );
+
     waterProgress = new Dtk::Widget::DWaterProgress( centerWidget );
     waterProgress->setFixedSize(60, 60);
     waterProgress->setVisible( false );
+    Dtk::Widget::moveToCenter( waterProgress );
 
     //m_ContextMenu = new QMenu;
-    QVBoxLayout *layout = new QVBoxLayout;    
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget( downListView );
     //layout->addWidget( waterProgress/*, 0, Qt::AlignCenter*/);
 
     centerWidget->setLayout( layout );
 
-    Dtk::Widget::moveToCenter( waterProgress );
-    //waterProgress->move(( this->width() - 60)/2,( this->height() -60)/2);
 
+    //waterProgress->move(( this->width() - 60)/2,( this->height() -60)/2);
     //selected = downListView->selectionModel()->selectedRows();
+
     connect( downListView, &QTableView::clicked,this, [=](QModelIndex modelIndex ){
 
           qDebug() << "downListView.click: " << modelIndex;

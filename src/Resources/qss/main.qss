@@ -21,14 +21,24 @@ QListWidget::item:selected {
 
 }
 
-QTableView::item:selected {
-/**
-    border: 0px;
-    background: #d5edfe;
-**/
+/*
+* QTableView
+*/
+
+QTableView {
+
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
-QTableView QHeaderView::section {
+QTableView::item:selected {
+
+    border: 0px;
+    background: #d5edfe;
+    color: #000000
+}
+
+QHeaderView::section {
     /*color: white;*/
 
     background-color: rgb(255,255,255);
@@ -48,7 +58,7 @@ QToolBar {
     padding: 1px;
 }
 
-QToolBar:handle {
+QToolBar::handle {
 
     /*background: #222222;*/
     /*border-left: 1pxdotted yellow*/;
@@ -72,7 +82,7 @@ QToolButton {
     height:32px;
 }
 
-QToolButton:hover {
+QToolButton::hover {
     background-color: #f2f0f5;
     border: 1px /*solid #222222*/;
 }
@@ -99,7 +109,7 @@ QToolButton::menu-button:hover {
 */
 }
 
-QToolButton:checked, QToolButton:pressed {
+QToolButton::checked, QToolButton::pressed {
 /*
     background-color: #111111;
     color: yellow;
@@ -133,10 +143,10 @@ QPushButton{
 
 }
 
-QPushButton:hover{
+QPushButton::hover{
 
 }
 
-QPushButton:pressed{
+QPushButton::pressed{
 
 }
